@@ -3,133 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediPulse Dashboard</title>
+<title>MediPulse Dashboard - Clean Image Theme</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:#e2e8f0;overflow-x:hidden}
+body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0.75)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') center/cover fixed;min-height:100vh;font-family:'Poppins',sans-serif;color:#334155;overflow-x:hidden}
 .mp-wrap{display:flex;flex-direction:column;min-height:100vh}
-.mp-header{background:rgba(8,55,81,0.97);border-bottom:1px solid rgba(1,202,139,0.2);padding:12px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(0,0,0,0.2)}
-.mp-logo-container{display:flex;align-items:center;gap:12px}
-.mp-logo-icon{width:42px;height:42px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px rgba(1,202,139,0.4)}
-.mp-logo-text{display:flex;flex-direction:column}
-.mp-logo-title{font-size:22px;font-weight:800;color:#fff;line-height:1.1}
-.mp-logo-title span{color:#01ca8b}
-.mp-logo-tagline{font-size:10.5px;color:#94a3b8;font-weight:500;letter-spacing:0.5px}
-.mp-search{flex:1;max-width:350px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:9px 18px;display:flex;align-items:center;gap:10px;margin-left:20px;transition:0.3s}
-.mp-search:focus-within{background:rgba(255,255,255,0.08);border-color:#01ca8b;box-shadow:0 0 10px rgba(1,202,139,0.1)}
-.mp-search input{background:none;border:none;outline:none;color:#e2e8f0;font-size:13px;width:100%;font-family:inherit}
-.mp-search input::placeholder{color:#64748b}
-.mp-hactions{margin-left:auto;display:flex;align-items:center;gap:12px}
-.mp-ibtn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#94a3b8;transition:0.3s}
-.mp-ibtn:hover{background:rgba(1,202,139,0.15);color:#01ca8b;border-color:rgba(1,202,139,0.3)}
-.mp-ibtn .bdg{position:absolute;top:-2px;right:-2px;background:#ef4444;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;box-shadow:0 0 8px rgba(239,68,68,0.5)}
-.mp-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg, #01ca8b, #38bdf8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#083751;cursor:pointer;box-shadow:0 0 10px rgba(1,202,139,0.3)}
-.mp-content{padding:24px;flex:1}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.scard{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:0.3s}
-.scard:hover{transform:translateY(-3px);background:rgba(255,255,255,0.05)}
-.scard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.scard.s1::after{background:#01ca8b;box-shadow:0 0 10px #01ca8b}
-.scard.s2::after{background:#38bdf8;box-shadow:0 0 10px #38bdf8}
-.scard.s3::after{background:#a78bfa;box-shadow:0 0 10px #a78bfa}
-.scard.s4::after{background:#f87171;box-shadow:0 0 10px #f87171}
-.scard-label{font-size:12px;color:#94a3b8;margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
-.scard-val{font-size:34px;font-weight:800;line-height:1}
-.scard.s1 .scard-val{color:#01ca8b}
-.scard.s2 .scard-val{color:#38bdf8}
-.scard.s3 .scard-val{color:#a78bfa}
-.scard.s4 .scard-val{color:#f87171}
-.scard-sub{font-size:11px;color:#64748b;margin-top:6px}
-.scard-ico{position:absolute;top:20px;right:20px;opacity:0.1;font-size:30px}
-.mid-grid{display:grid;grid-template-columns:1fr 1.8fr;gap:16px;margin-bottom:16px}
-.panel{background:rgba(10,34,54,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:20px;backdrop-filter:blur(10px)}
-.ptitle{font-size:13px;font-weight:600;color:#01ca8b;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.ldot{width:8px;height:8px;border-radius:50%;background:#01ca8b;animation:lp 1.5s infinite;box-shadow:0 0 8px #01ca8b}
-@keyframes lp{0%,100%{opacity:1}50%{opacity:0.3}}
-.tok-box{background:linear-gradient(180deg, rgba(1,202,139,0.08) 0%, rgba(1,202,139,0.02) 100%);border:1px solid rgba(1,202,139,0.2);border-radius:16px;padding:24px;text-align:center;margin-bottom:16px}
-.tok-lbl{font-size:11px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:600}
-.tok-num{font-size:72px;font-weight:800;color:#01ca8b;line-height:1;text-shadow:0 0 20px rgba(1,202,139,0.3)}
-.tok-name{font-size:15px;color:#cbd5e1;margin-top:8px;font-weight:500}
-.tok-wait{font-size:12px;color:#38bdf8;margin-top:4px}
-.next-row{display:flex;gap:10px;margin-bottom:16px}
-.ntpill{flex:1;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:12px;text-align:center}
-.ntpill .nn{font-size:24px;font-weight:700;color:#fff}
-.ntpill .nl{font-size:10px;color:#64748b;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
-.emg-box{background:linear-gradient(90deg, rgba(239,68,68,0.1) 0%, transparent 100%);border-left:3px solid #ef4444;border-radius:8px;padding:14px}
-.emg-hd{font-size:12px;color:#f87171;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:0.5px}
-.emg-row{font-size:13px;color:#fca5a5;padding:6px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed rgba(239,68,68,0.2)}
-.emg-row:last-child{border-bottom:none}
-.emg-badge{background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.5px}
-.phead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.add-btn{background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:0.3s;box-shadow:0 4px 15px rgba(1,202,139,0.3)}
-.add-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(1,202,139,0.4)}
-.ptbl{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
-.ptbl th{color:#94a3b8;font-weight:600;padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);font-size:11px;letter-spacing:0.5px;text-transform:uppercase}
-.ptbl td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,0.03);color:#cbd5e1;vertical-align:middle}
-.ptbl tr:hover td{background:rgba(255,255,255,0.02)}
-.sbadge{padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600}
-.sw{background:rgba(250,204,21,0.1);color:#fde047;border:1px solid rgba(250,204,21,0.2)}
-.sa{background:rgba(1,202,139,0.1);color:#01ca8b;border:1px solid rgba(1,202,139,0.2)}
-.se{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
-.del-btn{background:transparent;border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:inherit;transition:0.3s;white-space:nowrap}
-.del-btn:hover{background:rgba(239,68,68,0.15);border-color:#ef4444}
-.bot-grid{display:grid;grid-template-columns:250px 1fr;gap:16px}
-.qa-btn{width:100%;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 16px;margin-bottom:10px;color:#e2e8f0;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;transition:0.3s}
-.qa-btn:hover{background:rgba(1,202,139,0.05);border-color:rgba(1,202,139,0.4);transform:translateX(4px)}
-.qa-btn.qd:hover{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.4)}
-.qico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.qi1{background:rgba(1,202,139,0.15);color:#01ca8b}
-.qi2{background:rgba(56,189,248,0.15);color:#38bdf8}
-.qi3{background:rgba(167,139,250,0.15);color:#a78bfa}
-.qi4{background:rgba(248,113,113,0.15);color:#f87171}
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.chart-lbl{font-size:12px;color:#94a3b8;margin-bottom:12px;font-weight:500}
 
-.ov-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.3s ease}
+/* Header */
+.mp-header{background:#ffffff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.mp-logo-container{display:flex;align-items:center;gap:12px}
+.mp-logo-icon{width:42px;height:42px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.mp-logo-text{display:flex;flex-direction:column}
+.mp-logo-title{font-size:22px;font-weight:800;color:#0f172a;line-height:1.1}
+.mp-logo-title span{color:#01ca8b}
+.mp-logo-tagline{font-size:10.5px;color:#64748b;font-weight:500;letter-spacing:0.5px}
+
+/* Search */
+.mp-search{flex:1;max-width:350px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 18px;display:flex;align-items:center;gap:10px;margin-left:20px;transition:0.3s}
+.mp-search:focus-within{background:#ffffff;border-color:#01ca8b;box-shadow:0 0 0 3px rgba(1,202,139,0.1)}
+.mp-search input{background:none;border:none;outline:none;color:#1e293b;font-size:13px;width:100%;font-family:inherit}
+.mp-search input::placeholder{color:#94a3b8}
+
+/* Header Actions */
+.mp-hactions{margin-left:auto;display:flex;align-items:center;gap:14px}
+.mp-ibtn{width:38px;height:38px;border-radius:8px;background:#ffffff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#64748b;transition:0.3s}
+.mp-ibtn:hover{background:#f0fdf4;color:#01ca8b;border-color:#bbf7d0}
+.mp-ibtn .bdg{position:absolute;top:-4px;right:-4px;background:#ef4444;border-radius:6px;padding:2px 6px;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.mp-avatar{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg, #01ca8b, #0ea5e9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#ffffff;cursor:pointer;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+
+.mp-content{padding:24px;flex:1;max-width:1400px;margin:0 auto;width:100%}
+
+/* Stats Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px}
+.scard{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:0.3s;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05)}
+.scard:hover{transform:translateY(-2px);box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.1);border-color:#cbd5e1}
+.scard-label{font-size:12px;color:#64748b;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.scard-val{font-size:32px;font-weight:800;line-height:1;color:#0f172a}
+.scard-sub{font-size:12px;color:#94a3b8;margin-top:8px;font-weight:500;display:flex;align-items:center;gap:4px}
+.scard-ico{position:absolute;top:20px;right:20px;font-size:24px;padding:10px;border-radius:10px}
+.scard.s1 .scard-ico{background:#ecfdf5;color:#01ca8b}
+.scard.s2 .scard-ico{background:#f0f9ff;color:#0ea5e9}
+.scard.s3 .scard-ico{background:#f5f3ff;color:#8b5cf6}
+.scard.s4 .scard-ico{background:#fef2f2;color:#ef4444}
+
+/* Panels */
+.mid-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:20px}
+.panel{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05)}
+.ptitle{font-size:14px;font-weight:600;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.ldot{width:8px;height:8px;border-radius:50%;background:#01ca8b;animation:lp 1.5s infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Queue Box */
+.tok-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;margin-bottom:20px}
+.tok-lbl{font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+.tok-num{font-size:64px;font-weight:800;color:#01ca8b;line-height:1}
+.tok-name{font-size:16px;color:#0f172a;margin-top:12px;font-weight:600}
+.tok-wait{font-size:13px;color:#64748b;margin-top:4px}
+
+.next-row{display:flex;gap:12px;margin-bottom:20px}
+.ntpill{flex:1;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}
+.ntpill .nn{font-size:20px;font-weight:700;color:#0f172a}
+.ntpill .nl{font-size:11px;color:#94a3b8;margin-top:4px;text-transform:uppercase;font-weight:600}
+
+.emg-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:8px;padding:16px}
+.emg-hd{font-size:13px;color:#b91c1c;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.emg-row{font-size:13px;color:#7f1d1d;padding:8px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(239,68,68,0.1);font-weight:500}
+.emg-row:last-child{border-bottom:none;padding-bottom:0}
+.emg-badge{background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:4px 8px;border-radius:4px}
+
+/* Table */
+.phead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.add-btn{background:#01ca8b;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:0.3s}
+.add-btn:hover{background:#00a773;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.ptbl{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.ptbl th{color:#64748b;font-weight:600;padding:12px 16px;text-align:left;border-bottom:2px solid #e2e8f0;font-size:12px;background:#f8fafc}
+.ptbl td{padding:16px;border-bottom:1px solid #f1f5f9;color:#334155;vertical-align:middle;font-weight:500}
+.ptbl tr:hover td{background:#f8fafc}
+.sbadge{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;display:inline-block}
+.sw{background:#fef3c7;color:#d97706}
+.sa{background:#ecfdf5;color:#008f62}
+.se{background:#fef2f2;color:#b91c1c}
+
+.del-btn{background:transparent;border:1px solid #fca5a5;color:#ef4444;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;transition:0.3s;font-weight:600}
+.del-btn:hover{background:#fef2f2;border-color:#ef4444}
+
+/* Bottom Grid */
+.bot-grid{display:grid;grid-template-columns:300px 1fr;gap:20px}
+.qa-btn{width:100%;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;color:#334155;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;transition:0.3s}
+.qa-btn:hover{background:#f8fafc;border-color:#cbd5e1;transform:translateY(-1px)}
+.qa-btn.qd:hover{background:#fef2f2;border-color:#fca5a5;color:#b91c1c}
+.qico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qi1{background:#ecfdf5;color:#01ca8b}
+.qi2{background:#f0f9ff;color:#0ea5e9}
+.qi3{background:#f5f3ff;color:#8b5cf6}
+.qi4{background:#fef2f2;color:#ef4444}
+
+/* Charts Area */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.chart-lbl{font-size:13px;color:#64748b;margin-bottom:16px;font-weight:600}
+
+/* Modals */
+.ov-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.2s ease}
 .ov-wrap.open{opacity:1;pointer-events:all}
-.modal{background:linear-gradient(145deg, #0a2236, #061928);border:1px solid rgba(1,202,139,0.3);box-shadow:0 10px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);border-radius:24px;padding:32px;width:480px;transform:translateY(20px);transition:0.3s ease}
+.modal{background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);border-radius:16px;padding:32px;width:520px;transform:translateY(20px);transition:0.3s ease}
 .ov-wrap.open .modal{transform:translateY(0)}
-.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.modal-hd h3{color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 0 10px rgba(1,202,139,0.4)}
-.close-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:0.3s}
-.close-btn:hover{background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3);transform:rotate(90deg)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;border-bottom:1px solid #f1f5f9;padding-bottom:16px}
+.modal-hd h3{color:#0f172a;font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.close-btn{background:#f1f5f9;border:none;color:#64748b;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:0.2s}
+.close-btn:hover{background:#e2e8f0;color:#0f172a}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
 .fg{display:flex;flex-direction:column;gap:8px}
 .fg.full{grid-column:1/-1}
-.fg label{font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
-.fg input:not([type="radio"]),.fg select{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:0.3s;box-shadow:inset 0 2px 5px rgba(0,0,0,0.2)}
-.fg input::placeholder{color:#475569}
-.fg input:not([type="radio"]):focus,.fg select:focus{border-color:#01ca8b;background:rgba(1,202,139,0.05);box-shadow:0 0 0 3px rgba(1,202,139,0.15), inset 0 2px 5px rgba(0,0,0,0.2)}
-.fg select option{background:#0a2236;color:#e2e8f0}
-.radio-group{display:flex;gap:20px;padding:10px 0;align-items:center}
-.radio-group label{font-size:13px!important;color:#cbd5e1!important;text-transform:none!important;font-weight:400!important;display:flex;align-items:center;gap:8px;cursor:pointer}
-.radio-group input[type="radio"]{accent-color:#01ca8b;width:16px;height:16px;cursor:pointer}
-.prio-row{display:flex;gap:12px;margin-bottom:24px;margin-top:20px}
-.prio-opt{flex:1;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:0.3s;font-size:13px;font-weight:500;color:#94a3b8;background:rgba(0,0,0,0.2)}
-.prio-opt:hover{border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.05)}
-.prio-opt.sel-normal{border-color:#01ca8b;background:rgba(1,202,139,0.1);color:#01ca8b;box-shadow:0 4px 15px rgba(1,202,139,0.15)}
-.prio-opt.sel-emergency{border-color:#ef4444;background:rgba(239,68,68,0.1);color:#f87171;box-shadow:0 4px 15px rgba(239,68,68,0.15)}
-.prio-ico{font-size:20px;display:block;margin-bottom:6px}
-.modal-actions{display:flex;gap:12px}
-.mbtn-pri{flex:1;background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.3s;box-shadow:0 4px 15px rgba(1,202,139,0.3)}
-.mbtn-pri:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(1,202,139,0.4)}
-.mbtn-sec{flex:0 0 100px;background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:0.3s}
-.mbtn-sec:hover{background:rgba(255,255,255,0.1)}
-.toast{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#083751;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:200}
-.toast.err{background:#ef4444;color:#fff}
+.fg label{font-size:12px;color:#475569;font-weight:600}
+.fg input:not([type="radio"]),.fg select{background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px 16px;color:#0f172a;font-size:14px;outline:none;font-family:inherit;transition:0.2s}
+.fg input::placeholder{color:#94a3b8}
+.fg input:not([type="radio"]):focus,.fg select:focus{border-color:#01ca8b;box-shadow:0 0 0 3px rgba(1,202,139,0.1)}
+.radio-group{display:flex;gap:20px;padding:8px 0;align-items:center}
+.radio-group label{font-size:14px!important;color:#334155!important;font-weight:500!important;display:flex;align-items:center;gap:8px;cursor:pointer}
+.radio-group input[type="radio"]{accent-color:#01ca8b;width:18px;height:18px;cursor:pointer}
+
+.prio-row{display:flex;gap:16px;margin-bottom:32px;margin-top:12px}
+.prio-opt{flex:1;border:2px solid #e2e8f0;border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:0.2s;font-size:14px;font-weight:600;color:#64748b;background:#ffffff}
+.prio-opt:hover{border-color:#cbd5e1;background:#f8fafc}
+.prio-opt.sel-normal{border-color:#01ca8b;background:#ecfdf5;color:#008f62}
+.prio-opt.sel-emergency{border-color:#ef4444;background:#fef2f2;color:#b91c1c}
+
+.modal-actions{display:flex;gap:16px}
+.mbtn-pri{flex:1;background:#01ca8b;color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.2s}
+.mbtn-pri:hover{background:#00a773}
+.mbtn-sec{flex:0 0 120px;background:#ffffff;color:#475569;border:1px solid #cbd5e1;border-radius:8px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.2s}
+.mbtn-sec:hover{background:#f8fafc;color:#0f172a}
+
+/* Toasts & Alerts */
+.toast{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#ffffff;border-radius:8px;padding:16px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;box-shadow:0 10px 25px -5px rgba(0,143,98,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:200}
+.toast.err{background:#ef4444;box-shadow:0 10px 25px -5px rgba(239,68,68,0.3)}
 .toast.show{transform:translateY(0);opacity:1}
-.del-confirm-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);backdrop-filter:blur(5px);z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.3s}
+
+.del-confirm-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.2s}
 .del-confirm-wrap.open{opacity:1;pointer-events:all}
-.del-modal{background:#0a2236;border:1px solid rgba(239,68,68,0.4);box-shadow:0 0 30px rgba(239,68,68,0.2);border-radius:24px;padding:32px;width:380px;text-align:center;transform:scale(0.95);transition:0.3s}
+.del-modal{background:#ffffff;border:none;border-radius:16px;padding:32px;width:400px;text-align:center;transform:scale(0.95);transition:0.2s;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)}
 .del-confirm-wrap.open .del-modal{transform:scale(1)}
-.del-modal h3{color:#fff;font-size:18px;font-weight:700;margin-bottom:12px}
-.del-modal p{color:#94a3b8;font-size:14px;margin-bottom:24px;line-height:1.5}
-.del-acts{display:flex;gap:12px;justify-content:center}
-.dbtn-yes{background:#ef4444;color:#fff;border:none;border-radius:50px;padding:12px 32px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.3s;box-shadow:0 4px 15px rgba(239,68,68,0.3)}
-.dbtn-yes:hover{background:#dc2626;transform:translateY(-2px)}
-.dbtn-no{background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:12px 32px;font-size:14px;cursor:pointer;font-family:inherit;transition:0.3s}
-.dbtn-no:hover{background:rgba(255,255,255,0.1)}
+.del-modal h3{color:#0f172a;font-size:20px;font-weight:700;margin-bottom:12px;margin-top:16px}
+.del-modal p{color:#475569;font-size:14px;margin-bottom:32px;line-height:1.5;font-weight:500}
+.del-acts{display:flex;gap:16px;justify-content:center}
+.dbtn-yes{background:#ef4444;color:#fff;border:none;border-radius:8px;padding:12px 32px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.2s;flex:1}
+.dbtn-yes:hover{background:#dc2626}
+.dbtn-no{background:#ffffff;color:#475569;border:1px solid #cbd5e1;border-radius:8px;padding:12px 32px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:0.2s;flex:1}
+.dbtn-no:hover{background:#f8fafc;color:#0f172a}
 </style>
 </head>
 <body>
@@ -170,52 +192,55 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
 
     <div class="stats-grid">
       <div class="scard s1">
-        <div class="scard-ico"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-        <div class="scard-label">Total Patients Today</div>
+        <div class="scard-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+        <div class="scard-label">Total Patients</div>
         <div class="scard-val" id="sc1">47</div>
-        <div class="scard-sub">+8 in last hour</div>
+        <div class="scard-sub"><span style="color:#01ca8b;font-weight:700">↑ 8</span> in last hour</div>
       </div>
       <div class="scard s2">
-        <div class="scard-ico"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></div>
+        <div class="scard-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></div>
         <div class="scard-label">Current Token</div>
         <div class="scard-val" id="sc2">T-12</div>
         <div class="scard-sub">Being served now</div>
       </div>
       <div class="scard s3">
-        <div class="scard-ico"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
+        <div class="scard-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
         <div class="scard-label">Available Beds</div>
         <div class="scard-val" id="sc3">14</div>
-        <div class="scard-sub">of 30 total</div>
+        <div class="scard-sub">out of 30 total</div>
       </div>
       <div class="scard s4">
-        <div class="scard-ico"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg></div>
-        <div class="scard-label">Emergency Cases</div>
+        <div class="scard-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg></div>
+        <div class="scard-label">Emergencies</div>
         <div class="scard-val" id="sc4">3</div>
-        <div class="scard-sub">Active right now</div>
+        <div class="scard-sub"><span style="color:#ef4444;font-weight:700">Priority</span> cases active</div>
       </div>
     </div>
 
     <div class="mid-grid">
       <div class="panel">
-        <div class="ptitle"><div class="ldot"></div>Live Queue</div>
+        <div class="ptitle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Live Queue Status
+        </div>
         <div class="tok-box">
           <div class="tok-lbl">Now Serving</div>
           <div class="tok-num" id="tokNum">12</div>
           <div class="tok-name" id="tokName">Ramesh Kumar</div>
-          <div class="tok-wait" id="tokWait">Avg wait: ~8 min</div>
+          <div class="tok-wait" id="tokWait">Est. wait: ~8 min</div>
         </div>
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;letter-spacing:0.5px;text-transform:uppercase;font-weight:600">Up Next</div>
+        <div style="font-size:12px;color:#0f172a;margin-bottom:12px;font-weight:700">Upcoming Tokens</div>
         <div class="next-row">
           <div class="ntpill"><div class="nn" id="nt1">13</div><div class="nl">Next</div></div>
-          <div class="ntpill"><div class="nn" id="nt2">14</div><div class="nl">After</div></div>
+          <div class="ntpill"><div class="nn" id="nt2">14</div><div class="nl">Later</div></div>
           <div class="ntpill"><div class="nn" id="nt3">15</div><div class="nl">Soon</div></div>
         </div>
         <div class="emg-box">
           <div class="emg-hd">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f87171"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
-            Emergency Priority
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+            Emergency Attention
           </div>
-          <div class="emg-row"><span>Sunita Devi — Chest Pain</span><span class="emg-badge">CRIT</span></div>
+          <div class="emg-row"><span>Sunita Devi — Chest Pain</span><span class="emg-badge">CRITICAL</span></div>
           <div class="emg-row"><span>Anil Sharma — Head Injury</span><span class="emg-badge">HIGH</span></div>
           <div class="emg-row"><span>Baby (6mo) — High Fever</span><span class="emg-badge">HIGH</span></div>
         </div>
@@ -224,25 +249,25 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
       <div class="panel">
         <div class="phead">
           <div class="ptitle" style="margin-bottom:0">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Patient Records
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Patient Directory
           </div>
           <button class="add-btn" onclick="openAdd()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Add Patient
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            New Registration
           </button>
         </div>
         <div style="overflow-x:auto">
           <table class="ptbl">
             <thead>
               <tr>
-                <th style="width:20%">Name</th>
-                <th style="width:10%">Token</th>
-                <th style="width:18%">Problem</th>
-                <th style="width:14%">Doctor</th>
+                <th style="width:22%">Patient Name</th>
+                <th style="width:12%">Token</th>
+                <th style="width:18%">Diagnosis</th>
+                <th style="width:14%">Assigned To</th>
                 <th style="width:12%">Ward</th>
                 <th style="width:12%">Status</th>
-                <th style="width:14%">Action</th>
+                <th style="width:10%">Action</th>
               </tr>
             </thead>
             <tbody id="ptbody"></tbody>
@@ -253,41 +278,41 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
 
     <div class="bot-grid">
       <div class="panel">
-        <div class="ptitle" style="margin-bottom:16px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <div class="ptitle" style="margin-bottom:20px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           Quick Actions
         </div>
         <button class="qa-btn" onclick="openAdd()">
-          <div class="qico qi1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
-          Add Patient
+          <div class="qico qi1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+          Register Patient
         </button>
         <button class="qa-btn" onclick="genTok()">
-          <div class="qico qi2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-          Generate Token
+          <div class="qico qi2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          Issue Token
         </button>
         <button class="qa-btn" onclick="admitPt()">
-          <div class="qico qi3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-          Admit Patient
+          <div class="qico qi3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          Admit to Ward
         </button>
         <button class="qa-btn qd" onclick="markEmg()">
-          <div class="qico qi4"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg></div>
-          Mark Emergency
+          <div class="qico qi4"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg></div>
+          Flag Emergency
         </button>
       </div>
 
       <div class="panel">
-        <div class="ptitle" style="margin-bottom:16px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Live Analytics
+        <div class="ptitle" style="margin-bottom:20px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Hospital Analytics
         </div>
         <div class="chart-grid">
           <div>
-            <div class="chart-lbl">Patients per hour</div>
-            <div style="position:relative;height:140px"><canvas id="hc"></canvas></div>
+            <div class="chart-lbl">Patient Influx (Hourly)</div>
+            <div style="position:relative;height:180px"><canvas id="hc"></canvas></div>
           </div>
           <div>
-            <div class="chart-lbl">Queue length trend</div>
-            <div style="position:relative;height:140px"><canvas id="qc"></canvas></div>
+            <div class="chart-lbl">Waiting Queue Trend</div>
+            <div style="position:relative;height:180px"><canvas id="qc"></canvas></div>
           </div>
         </div>
       </div>
@@ -300,14 +325,16 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
   <div class="modal">
     <div class="modal-hd">
       <h3>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-        Register New Patient
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        New Patient Entry
       </h3>
-      <button class="close-btn" onclick="closeAdd()">✕</button>
+      <button class="close-btn" onclick="closeAdd()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     
     <div class="form-grid">
-      <div class="fg">
+      <div class="fg full">
         <label>Full Name</label>
         <input type="text" id="fn" placeholder="e.g. Priya Singh">
       </div>
@@ -324,14 +351,11 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         </div>
       </div>
       
-      <div class="fg">
-        <label>Phone</label>
-        <input type="text" id="fphone" placeholder="+91 98765...">
-      </div>
       <div class="fg full">
-        <label>Problem / Complaint</label>
-        <input type="text" id="fprob" placeholder="e.g. High fever, Back pain, Chest tightness...">
+        <label>Primary Complaint</label>
+        <input type="text" id="fprob" placeholder="e.g. High fever, Back pain...">
       </div>
+
       <div class="fg">
         <label>Assign Doctor</label>
         <select id="fdoc">
@@ -342,7 +366,7 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         </select>
       </div>
       <div class="fg">
-        <label>Ward</label>
+        <label>Assign Ward</label>
         <select id="fward">
           <option>General OPD</option>
           <option>ICU</option>
@@ -352,50 +376,42 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
       </div>
     </div>
     
-    <div style="font-size:11px;color:#94a3b8;letter-spacing:0.5px;text-transform:uppercase;font-weight:600;margin-top:16px;">Priority Level</div>
+    <label style="font-size:12px;color:#475569;font-weight:600;display:block">Triage Priority</label>
     <div class="prio-row">
       <div class="prio-opt sel-normal" id="poNormal" onclick="selPrio('normal')">
-        <span class="prio-ico">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </span>Normal Queue
+        Normal Queue
       </div>
       <div class="prio-opt" id="poEmrg" onclick="selPrio('emergency')">
-        <span class="prio-ico">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
-        </span>Emergency
+        Emergency
       </div>
     </div>
     
     <div class="modal-actions">
       <button class="mbtn-sec" onclick="closeAdd()">Cancel</button>
-      <button class="mbtn-pri" onclick="submitPt()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:6px"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-        Register Patient
-      </button>
+      <button class="mbtn-pri" onclick="submitPt()">Register Patient</button>
     </div>
   </div>
 </div>
 
 <div id="delModal" class="del-confirm-wrap">
   <div class="del-modal">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="#ef4444" style="margin-bottom:16px"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
-    <h3>Confirm Delete</h3>
-    <p id="delMsg">Are you sure you want to remove this patient record?</p>
+    <div style="background:#fef2f2;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>
+    </div>
+    <h3>Delete Record?</h3>
+    <p id="delMsg">Are you sure you want to remove this patient from the active directory? This cannot be undone.</p>
     <div class="del-acts">
       <button class="dbtn-no" onclick="closeDelModal()">Cancel</button>
-      <button class="dbtn-yes" onclick="confirmDel()">Yes, Delete</button>
+      <button class="dbtn-yes" onclick="confirmDel()">Delete Record</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  // Simple frontend logic setup
   let tokNum = 12, nextTok = 16, totalPts = 47, beds = 14, emgCnt = 3;
   let selPrioVal = 'normal';
   let pendingDelIdx = null;
-
-  const namePool = ['Ramesh Kumar','Kavya Mehta','Deepak Rao','Neha Singh','Vijay Tiwari','Priya Sharma','Suresh Verma','Anita Devi'];
 
   let patients = [
     {name:'Ramesh Kumar',token:'T-12',age:45,problem:'BP High',doctor:'Dr. Mehta',ward:'General OPD',status:'waiting'},
@@ -406,27 +422,24 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
     {name:'Sunita Devi',token:'T-E1',age:62,problem:'Chest Pain',doctor:'Dr. Rao',ward:'ICU',status:'emergency'},
   ];
 
-  // Function to render table
   function renderTbl(list) {
     document.getElementById('ptbody').innerHTML = list.map((p, i) => `
       <tr>
-        <td style="font-weight:500;color:#f8fafc">${p.name}</td>
+        <td style="font-weight:600;color:#0f172a">${p.name}</td>
         <td style="color:#01ca8b;font-weight:700">${p.token}</td>
         <td>${p.problem}</td>
-        <td style="color:#94a3b8">${p.doctor}</td>
-        <td style="color:#94a3b8">${p.ward}</td>
-        <td><span class="sbadge s${p.status[0]}">${p.status}</span></td>
+        <td>${p.doctor}</td>
+        <td>${p.ward}</td>
+        <td><span class="sbadge s${p.status[0]}">${p.status.toUpperCase()}</span></td>
         <td>
           <button class="del-btn" onclick="openDelModal(${patients.indexOf(p)})">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-            Delete
+            Remove
           </button>
         </td>
       </tr>
     `).join('');
   }
 
-  // Filter for search
   function filterP(q) {
     renderTbl(patients.filter(p =>
       p.name.toLowerCase().includes(q.toLowerCase()) ||
@@ -437,7 +450,6 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
 
   renderTbl(patients);
 
-  // Modal Handlers
   function openAdd() { document.getElementById('addModal').classList.add('open'); }
   function closeAdd() { document.getElementById('addModal').classList.remove('open'); }
 
@@ -447,15 +459,12 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
     document.getElementById('poEmrg').className = 'prio-opt' + (v === 'emergency' ? ' sel-emergency' : '');
   }
 
-  // Form Submit Handler
   function submitPt() {
     const name = document.getElementById('fn').value.trim();
     const age = document.getElementById('fage').value.trim();
     const problem = document.getElementById('fprob').value.trim();
     const doctor = document.getElementById('fdoc').value;
     const ward = document.getElementById('fward').value;
-    
-    // Getting value from selected radio button
     const genderInput = document.querySelector('input[name="gender"]:checked');
     const gender = genderInput ? genderInput.value : '';
 
@@ -475,18 +484,16 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
     
     renderTbl(patients);
     
-    // Reset Form
-    ['fn', 'fage', 'fphone', 'fprob'].forEach(id => document.getElementById(id).value = '');
+    ['fn', 'fage', 'fprob'].forEach(id => document.getElementById(id).value = '');
     if(genderInput) genderInput.checked = false;
     selPrio('normal');
     closeAdd();
-    showToast('Patient registered — Token: ' + token);
+    showToast('Registered — Token: ' + token);
   }
 
-  // Delete Handlers
   function openDelModal(idx) {
     pendingDelIdx = idx;
-    document.getElementById('delMsg').textContent = 'Remove "' + patients[idx].name + '" (' + patients[idx].token + ') from records?';
+    document.getElementById('delMsg').textContent = 'Are you sure you want to remove "' + patients[idx].name + '" (' + patients[idx].token + ')?';
     document.getElementById('delModal').classList.add('open');
   }
   
@@ -507,13 +514,12 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
     document.getElementById('sc1').textContent = totalPts;
     renderTbl(patients);
     closeDelModal();
-    showToast('Record deleted: ' + p.name, 'err');
+    showToast('Deleted: ' + p.name, 'err');
   }
 
-  // Quick Action Handlers
   function genTok() { 
     nextTok++; 
-    showToast('Token generated: T-' + nextTok); 
+    showToast('Token Generated: T-' + nextTok); 
   }
   
   function admitPt() {
@@ -524,7 +530,7 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
       if (beds < 0) beds = 0;
       document.getElementById('sc3').textContent = beds;
       renderTbl(patients);
-      showToast(w.name + ' admitted to ward');
+      showToast(w.name + ' admitted');
     } else {
       showToast('No waiting patients', 'err');
     }
@@ -539,11 +545,10 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
       renderTbl(patients);
       showToast(p.name + ' marked emergency!');
     } else {
-        showToast('No waiting patients to mark', 'err');
+        showToast('No waiting patients', 'err');
     }
   }
 
-  // Toast Notification
   function showToast(msg, type) {
     const t = document.getElementById('toastEl');
     const m = document.getElementById('toastMsg');
@@ -552,8 +557,7 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
     setTimeout(() => t.classList.remove('show'), 3200);
   }
 
-  // Simple Chart Initializations
-  Chart.defaults.color = '#94a3b8';
+  Chart.defaults.color = '#64748b';
   Chart.defaults.font.family = "'Poppins', sans-serif";
 
   new Chart(document.getElementById('hc'), {
@@ -562,10 +566,8 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         labels: ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'],
         datasets: [{
             data: [4, 7, 11, 15, 9, 13, 18, 12],
-            backgroundColor: 'rgba(1, 202, 139, 0.4)',
-            borderColor: '#01ca8b',
-            borderWidth: 1,
-            borderRadius: 4
+            backgroundColor: '#01ca8b',
+            borderRadius: 6
         }]
     },
     options: {
@@ -573,8 +575,8 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+            x: { grid: { display: false }, border: {display: false} },
+            y: { grid: { color: '#e2e8f0', drawBorder: false }, beginAtZero: true, border: {display: false} }
         }
     }
   });
@@ -585,13 +587,13 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         labels: ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'],
         datasets: [{
             data: [2, 5, 8, 12, 7, 10, 14, 9],
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-            borderWidth: 2,
+            borderColor: '#0ea5e9',
+            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+            borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: '#38bdf8'
+            pointRadius: 0,
+            pointHoverRadius: 6
         }]
     },
     options: {
@@ -599,8 +601,8 @@ body{background:#083751;min-height:100vh;font-family:'Poppins',sans-serif;color:
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+            x: { grid: { display: false }, border: {display: false} },
+            y: { grid: { color: '#e2e8f0', drawBorder: false }, beginAtZero: true, border: {display: false} }
         }
     }
   });

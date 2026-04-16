@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPulse - Doctor Directory</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    /* Fallback color agar image load na ho */
+    background-color: #e0f2fe; 
+    
+    /* Gradient overlay aur naya stable background image */
+    background-image: 
+        linear-gradient(rgba(236, 248, 255, 0.85), rgba(0, 55, 74, 0.9)), 
+        url('https://media.gettyimages.com/id/1312706504/photo/modern-hospital-building.jpg?s=612x612&w=0&k=20&c=DT6YDRZMH5G5dL-Qv6VwPpVDpIDxJqkAY4Gg0ojGi58='); 
+    
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    min-height: 100vh; 
+    font-family: 'Poppins', sans-serif; 
+    color: #334155; 
+    overflow-x: hidden; 
+}
+.mp-wrap { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Header */
+.mp-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 50; }
+.mp-logo-container { display: flex; align-items: center; gap: 12px; }
+.mp-logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #01ca8b, #008f62); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(1,202,139,0.3); }
+.mp-logo-text { display: flex; flex-direction: column; }
+.mp-logo-title { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.1; }
+.mp-logo-title span { color: #01ca8b; }
+.mp-logo-tagline { font-size: 10.5px; color: #64748b; font-weight: 500; letter-spacing: 0.5px; }
+
+.mp-search { flex: 1; max-width: 350px; background: #f1f5f9; border: 1px solid transparent; border-radius: 10px; padding: 10px 18px; display: flex; align-items: center; gap: 10px; margin-left: 20px; transition: 0.3s; }
+.mp-search:focus-within { background: #ffffff; border-color: #01ca8b; box-shadow: 0 0 0 4px rgba(1,202,139,0.1); }
+.mp-search input { background: none; border: none; outline: none; color: #1e293b; font-size: 13px; width: 100%; font-family: inherit; }
+.mp-search input::placeholder { color: #94a3b8; }
+
+.mp-hactions { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.mp-avatar { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #01ca8b, #0ea5e9); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #ffffff; cursor: pointer; box-shadow: 0 4px 10px rgba(1,202,139,0.2); }
+
+/* Page Content */
+.mp-content { padding: 30px 24px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05); }
+.page-title h1 { font-size: 22px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 12px; }
+.page-title p { font-size: 14px; color: #64748b; margin-top: 6px; }
+
+/* Doctor Grid */
+.doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+
+.doc-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; display: flex; flex-direction: column; gap: 16px; }
+.doc-card:hover { transform: translateY(-8px); box-shadow: 0 20px 35px -10px rgba(1, 202, 139, 0.15); border-color: #01ca8b; }
+
+.doc-top { display: flex; gap: 16px; align-items: flex-start; }
+.doc-avatar { width: 68px; height: 68px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; font-weight: 700; flex-shrink: 0; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+.doc-info { flex: 1; margin-top: 4px; }
+.doc-name { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.doc-spec { font-size: 12.5px; font-weight: 600; color: #01ca8b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Status Badge */
+.doc-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; position: absolute; top: 24px; right: 24px; }
+.doc-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+.st-available { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.st-available::before { background: #059669; box-shadow: 0 0 0 2px rgba(5,150,105,0.2); }
+.st-busy { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.st-busy::before { background: #dc2626; animation: pulse 1.5s infinite; }
+.st-off { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+.st-off::before { background: #94a3b8; }
+
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.4); } 70% { box-shadow: 0 0 0 6px rgba(220,38,38,0); } 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); } }
+
+/* Details Layout */
+.doc-details { background: #f8fafc; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 14px; border: 1px solid #f1f5f9; flex: 1; }
+.detail-row { display: flex; align-items: center; gap: 12px; }
+.detail-icon { color: #94a3b8; display: flex; background: #fff; padding: 6px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.detail-text { display: flex; flex-direction: column; }
+.dt-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+.dt-val { font-size: 13px; color: #0f172a; font-weight: 600; margin-top: 2px; }
+
+/* Active Patient Highlight */
+.active-patient { background: #fff1f2; border-left: 3px solid #ef4444; padding: 12px; border-radius: 8px; margin-top: 4px; box-shadow: inset 0 0 0 1px #ffe4e6; }
+.active-patient .detail-icon { background: #fee2e2; color: #ef4444; }
+.active-patient .dt-lbl { color: #dc2626; }
+.active-patient .dt-val { color: #991b1b; }
+
+.doc-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px dashed #cbd5e1; }
+.assigned-count { font-size: 13px; color: #475569; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.assigned-count span { background: #0f172a; color: #fff; padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+.view-btn { background: #ecfdf5; border: 1px solid #a7f3d0; color: #059669; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
+.view-btn:hover { background: #01ca8b; color: #fff; border-color: #01ca8b; }
+
+/* MODAL STYLES */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); z-index: 100; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal-content { background: #ffffff; width: 90%; max-width: 500px; border-radius: 24px; padding: 30px; position: relative; transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+.modal-overlay.active .modal-content { transform: translateY(0); }
+.close-btn { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: 0.2s; }
+.close-btn:hover { background: #e2e8f0; color: #0f172a; }
+.modal-header { display: flex; gap: 16px; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px; }
+.modal-avatar { width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; }
+.modal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.m-box { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #f1f5f9; }
+.m-box h4 { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+.m-box p { font-size: 14px; font-weight: 600; color: #0f172a; }
+.m-about { background: #f0f9ff; padding: 16px; border-radius: 12px; border-left: 4px solid #0ea5e9; }
+.m-about h4 { font-size: 12px; color: #0284c7; margin-bottom: 6px; }
+.m-about p { font-size: 13px; color: #334155; line-height: 1.6; }
+
+</style>
+</head>
+<body>
+
+<div class="mp-wrap">
+  <div class="mp-header">
+    <div class="mp-logo-container">
+      <div class="mp-logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
+      </div>
+      <div class="mp-logo-text">
+        <div class="mp-logo-title">Medi<span>Pulse</span></div>
+        <div class="mp-logo-tagline">Where Patient Flow Meets Smart Technology</div>
+      </div>
+    </div>
+    <div class="mp-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search doctor, specialization..." id="srch" oninput="filterDoctors(this.value)">
+    </div>
+    <div class="mp-hactions">
+      <div class="mp-avatar">SR</div>
+    </div>
+  </div>
+
+  <div class="mp-content">
+    <div class="page-header">
+      <div class="page-title">
+        <h1>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Doctor Directory & Live Status
+        </h1>
+        <p>Real-time view of doctor availability and current patient assignments.</p>
+      </div>
+    </div>
+
+    <div class="doc-grid" id="doctorGrid">
+      </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="doctorModal" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="close-btn" onclick="closeModal(true)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    
+    <div class="modal-header">
+      <div class="modal-avatar" id="mAvatar"></div>
+      <div>
+        <h2 id="mName" style="font-size: 20px; color: #0f172a; margin-bottom: 4px;"></h2>
+        <p id="mSpec" style="font-size: 14px; font-weight: 600; color: #01ca8b;"></p>
+      </div>
+    </div>
+
+    <div class="modal-info-grid">
+      <div class="m-box">
+        <h4>Experience</h4>
+        <p id="mExp"></p>
+      </div>
+      <div class="m-box">
+        <h4>Education</h4>
+        <p id="mEdu"></p>
+      </div>
+      <div class="m-box">
+        <h4>Cabin Number</h4>
+        <p id="mCabin"></p>
+      </div>
+      <div class="m-box">
+        <h4>Consultation Fee</h4>
+        <p id="mFee"></p>
+      </div>
+    </div>
+
+    <div class="m-about">
+      <h4>About Doctor</h4>
+      <p id="mAbout"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Extended Doctor Data Array with More Details
+  const doctors = [
+    {
+      id: "D1", name: "Dr. Arvind Mehta", spec: "General Physician", bg: "linear-gradient(135deg, #0ea5e9, #0284c7)",
+      days: "Mon - Sat", time: "09:00 AM - 02:00 PM", status: "busy", currentPatient: "Ramesh Kumar (T-12)", assignedToday: 24,
+      experience: "15+ Years", education: "MBBS, MD (Medicine)", cabin: "A-102", fee: "₹ 500",
+      about: "Dr. Arvind is a highly experienced physician specializing in internal medicine, viral fevers, and preventive healthcare strategies."
+    },
+    {
+      id: "D2", name: "Dr. Priya Sharma", spec: "Pediatrician", bg: "linear-gradient(135deg, #f43f5e, #e11d48)",
+      days: "Mon - Fri", time: "10:00 AM - 04:00 PM", status: "available", currentPatient: null, assignedToday: 15,
+      experience: "8 Years", education: "MBBS, MD (Pediatrics)", cabin: "B-205", fee: "₹ 600",
+      about: "Dr. Priya focuses on newborn care, child development, and vaccinations. She is known for her friendly approach towards kids."
+    },
+    {
+      id: "D3", name: "Dr. Deepak Rao", spec: "Cardiologist", bg: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+      days: "Tue - Sun", time: "11:00 AM - 05:00 PM", status: "busy", currentPatient: "Sunita Devi (T-E1)", assignedToday: 8,
+      experience: "20 Years", education: "MBBS, DM (Cardiology)", cabin: "ICU-1", fee: "₹ 1200",
+      about: "Dr. Deepak is a senior cardiologist specializing in echocardiography, angioplasty, and critical heart conditions."
+    },
+    {
+      id: "D4", name: "Dr. Neha Verma", spec: "Neurologist", bg: "linear-gradient(135deg, #10b981, #059669)",
+      days: "Mon, Wed, Fri", time: "02:00 PM - 07:00 PM", status: "off", currentPatient: null, assignedToday: 0,
+      experience: "12 Years", education: "MBBS, DM (Neurology)", cabin: "C-301", fee: "₹ 1000",
+      about: "Expert in treating migraines, epilepsy, and nerve disorders. She uses advanced neuro-diagnostic techniques."
+    },
+    {
+      id: "D5", name: "Dr. Suresh Tiwari", spec: "Orthopedic", bg: "linear-gradient(135deg, #f59e0b, #d97706)",
+      days: "Mon - Sat", time: "09:00 AM - 01:00 PM", status: "busy", currentPatient: "Vijay Singh (T-11)", assignedToday: 18,
+      experience: "18 Years", education: "MBBS, MS (Ortho)", cabin: "A-105", fee: "₹ 800",
+      about: "Specializes in joint replacement surgeries, sports injuries, and complex fracture management."
+    },
+    {
+      id: "D6", name: "Dr. Anita Desai", spec: "Dermatologist", bg: "linear-gradient(135deg, #ec4899, #be185d)",
+      days: "Thu - Sun", time: "10:00 AM - 03:00 PM", status: "available", currentPatient: null, assignedToday: 12,
+      experience: "10 Years", education: "MBBS, MD (Dermatology)", cabin: "B-210", fee: "₹ 700",
+      about: "Renowned for clinical dermatology, cosmetic procedures, and advanced laser treatments for skin conditions."
+    }
+  ];
+
+  function getInitials(name) {
+    return name.replace('Dr. ', '').split(' ').map(n => n[0]).join('').substring(0, 2);
+  }
+
+  function getStatusMarkup(status) {
+    if (status === 'available') return `<div class="doc-status st-available">AVAILABLE</div>`;
+    if (status === 'busy') return `<div class="doc-status st-busy">IN CABIN</div>`;
+    return `<div class="doc-status st-off">OFF DUTY</div>`;
+  }
+
+  // Render Function
+  function renderDoctors(list) {
+    const grid = document.getElementById('doctorGrid');
+    grid.innerHTML = list.map(doc => `
+      <div class="doc-card">
+        ${getStatusMarkup(doc.status)}
+        
+        <div class="doc-top">
+          <div class="doc-avatar" style="background: ${doc.bg}">${getInitials(doc.name)}</div>
+          <div class="doc-info">
+            <div class="doc-name">${doc.name}</div>
+            <div class="doc-spec">${doc.spec}</div>
+          </div>
+        </div>
+
+        <div class="doc-details">
+          <div class="detail-row">
+            <div class="detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="detail-text">
+              <div class="dt-lbl">Schedule Days</div>
+              <div class="dt-val">${doc.days}</div>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="detail-text">
+              <div class="dt-lbl">Timings</div>
+              <div class="dt-val">${doc.time}</div>
+            </div>
+          </div>
+          
+          ${doc.status === 'busy' && doc.currentPatient ? `
+            <div class="detail-row active-patient">
+              <div class="detail-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div class="detail-text">
+                <div class="dt-lbl">Currently Serving</div>
+                <div class="dt-val">${doc.currentPatient}</div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="doc-footer">
+          <div class="assigned-count">
+            Today's Queue <span>${doc.assignedToday}</span>
+          </div>
+          <button class="view-btn" onclick="openModal('${doc.id}')">
+            View Details 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Initial Render
+  renderDoctors(doctors);
+
+  // Search/Filter Functionality
+  function filterDoctors(query) {
+    const q = query.toLowerCase();
+    const filtered = doctors.filter(d => 
+      d.name.toLowerCase().includes(q) || 
+      d.spec.toLowerCase().includes(q)
+    );
+    renderDoctors(filtered);
+  }
+
+  // Modal Functionality
+  function openModal(id) {
+    const doc = doctors.find(d => d.id === id);
+    if(!doc) return;
+
+    // Populate Data
+    document.getElementById('mAvatar').style.background = doc.bg;
+    document.getElementById('mAvatar').innerText = getInitials(doc.name);
+    document.getElementById('mName').innerText = doc.name;
+    document.getElementById('mSpec').innerText = doc.spec;
+    document.getElementById('mExp').innerText = doc.experience;
+    document.getElementById('mEdu').innerText = doc.education;
+    document.getElementById('mCabin').innerText = doc.cabin;
+    document.getElementById('mFee').innerText = doc.fee;
+    document.getElementById('mAbout').innerText = doc.about;
+
+    // Show Modal
+    document.getElementById('doctorModal').classList.add('active');
+  }
+
+  function closeModal(force = false) {
+    if (force || event.target.id === 'doctorModal') {
+      document.getElementById('doctorModal').classList.remove('active');
+    }
+  }
+</script>
+
+</body>
+</html>

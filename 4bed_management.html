@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPulse - Bed Management (White & Green)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  /* Beautiful White/Green theme with subtle background image visibility */
+  background: linear-gradient(rgba(244, 247, 250, 0.85), rgba(244, 247, 250, 0.85)), 
+              url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2080&auto=format&fit=crop') center/cover fixed;
+  min-height:100vh;
+  font-family:'Poppins',sans-serif;
+  color:#334155; /* Dark slate text for clarity */
+  overflow-x:hidden;
+}
+
+.mp-wrap{display:flex;flex-direction:column;min-height:100vh}
+
+/* Header */
+.mp-header{background:rgba(255, 255, 255, 0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(1,202,139,0.2);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50;box-shadow:0 2px 15px rgba(0,0,0,0.05)}
+.mp-logo-container{display:flex;align-items:center;gap:12px}
+.mp-logo-icon{width:38px;height:38px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.mp-logo-text{display:flex;flex-direction:column}
+.mp-logo-title{font-size:22px;font-weight:800;color:#0f172a;line-height:1.1}
+.mp-logo-title span{color:#01ca8b}
+.mp-logo-tagline{font-size:10.5px;color:#64748b;font-weight:500;letter-spacing:0.5px}
+
+.mp-hactions{margin-left:auto;display:flex;align-items:center;gap:16px}
+.live-badge{background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;padding:6px 12px;border-radius:50px;font-size:10px;font-weight:400;display:flex;align-items:center;gap:6px}
+.live-dot{width:8px;height:8px;background:#059669;border-radius:50%;animation:pulse-live 1.5s infinite}
+.mp-avatar{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg, #01ca8b, #0ea5e9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#ffffff;cursor:pointer;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+
+@keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Main Layout */
+.bm-layout{display:flex;gap:24px;padding:24px;max-width:1450px;margin:0 auto;width:100%;align-items:flex-start}
+.bm-main{flex:1;display:flex;flex-direction:column;gap:24px}
+.bm-sidebar{width:400px;flex-shrink:0;position:sticky;top:85px}
+
+/* Stats Row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-pill{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+.st-info{display:flex;flex-direction:column}
+.st-lbl{font-size:12px;color:#64748b;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:4px}
+.st-val{font-size:28px;font-weight:800;color:#0f172a;line-height:1}
+.st-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+
+.sp-tot .st-icon{background:#f0f9ff;color:#0ea5e9}
+.sp-avl .st-icon{background:#ecfdf5;color:#059669}
+.sp-occ .st-icon{background:#fef2f2;color:#dc2626}
+.sp-emg .st-icon{background:#fffbeb;color:#d97706}
+
+/* Zones & Grids */
+.zone-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+.zone-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.zone-title{font-size:16px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:1px}
+
+/* Bed Nodes */
+.grid-icu{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.grid-gen{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+.grid-pvt{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+.bed-node{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:0.2s;position:relative;overflow:hidden}
+.bed-node:hover{transform:translateY(-3px);background:#f1f5f9;box-shadow:0 4px 10px rgba(0,0,0,0.05);border-color:#cbd5e1}
+.bed-node::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;opacity:0.9}
+
+.b-id{font-size:14px;font-weight:700;color:#1e293b}
+.s-dot{width:12px;height:12px;border-radius:50%}
+
+/* Status Colors (Light Theme) */
+.bed-node.free::before{background:#01ca8b}
+.bed-node.free .s-dot{background:#01ca8b;box-shadow:0 0 8px rgba(1,202,139,0.4)}
+
+.bed-node.occ::before{background:#ef4444}
+.bed-node.occ .s-dot{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.4)}
+
+.bed-node.emg::before{background:#f59e0b}
+.bed-node.emg{background:#fffbeb;border-color:#fde68a}
+.bed-node.emg .s-dot{background:#f59e0b;animation:emg-pulse 1s infinite}
+
+.bed-node.sel{border-color:#01ca8b;background:#ecfdf5;transform:scale(1.05)}
+.bed-node.sel::after{content:'';position:absolute;inset:0;border:2px solid #01ca8b;border-radius:12px}
+
+@keyframes emg-pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+
+/* Right Sidebar Details */
+.detail-panel{background:rgba(255, 255, 255, 0.95);backdrop-filter:blur(10px);border:1px solid #e2e8f0;border-radius:16px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,0.08);display:flex;flex-direction:column;min-height:520px}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;color:#64748b;gap:16px}
+.empty-state svg{width:64px;height:64px;opacity:0.2;color:#0f172a}
+
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
+.ph-title{font-size:22px;font-weight:700;color:#0f172a}
+.ph-badge{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+
+.info-grid{display:flex;flex-direction:column;gap:12px}
+.ig-row{background:#f8fafc;border:1px solid #f1f5f9;padding:14px 18px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.ig-lbl{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.ig-val{font-size:14px;color:#0f172a;font-weight:600;text-align:right}
+
+.pat-section{margin-top:24px}
+.ps-title{font-size:12px;color:#01ca8b;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.action-row{display:flex;gap:12px;margin-top:auto;padding-top:24px}
+.btn-act{flex:1;padding:14px;border-radius:10px;border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-admit{background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;box-shadow:0 4px 15px rgba(1,202,139,0.3)}
+.btn-admit:hover{box-shadow:0 6px 20px rgba(1,202,139,0.4);transform:translateY(-2px)}
+.btn-disch{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c}
+.btn-disch:hover{background:#fee2e2;transform:translateY(-2px)}
+
+/* Toast */
+.toastbox{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#ffffff;border-radius:10px;padding:14px 24px;font-size:14px;font-weight:600;box-shadow:0 8px 25px rgba(1,202,139,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:999}
+.toastbox.show{transform:translateY(0);opacity:1}
+
+</style>
+</head>
+<body>
+
+<div class="mp-wrap">
+  <div class="mp-header">
+    <div class="mp-logo-container">
+      <div class="mp-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
+      </div>
+      <div class="mp-logo-text">
+        <div class="mp-logo-title"><span>MediPulse</span></div>
+        <div class="mp-logo-tagline">Bed Management System</div>
+      </div>
+    </div>
+    
+    <div class="mp-hactions">
+      <div class="live-badge"><div class="live-dot"></div> Live Tracker</div>
+      <div class="mp-avatar">SR</div>
+    </div>
+  </div>
+
+  <div class="bm-layout">
+    <div class="bm-main">
+      
+      <div class="stats-row">
+        <div class="stat-pill sp-tot">
+          <div class="st-info">
+            <span class="st-lbl">Total Capacity</span>
+            <span class="st-val" id="ct">0</span>
+          </div>
+          <div class="st-icon">🛏️</div>
+        </div>
+        <div class="stat-pill sp-avl">
+          <div class="st-info">
+            <span class="st-lbl">Available</span>
+            <span class="st-val" style="color:#059669" id="cf">0</span>
+          </div>
+          <div class="st-icon">✓</div>
+        </div>
+        <div class="stat-pill sp-occ">
+          <div class="st-info">
+            <span class="st-lbl">Occupied</span>
+            <span class="st-val" style="color:#dc2626" id="co">0</span>
+          </div>
+          <div class="st-icon">👥</div>
+        </div>
+        <div class="stat-pill sp-emg">
+          <div class="st-info">
+            <span class="st-lbl">Emergency</span>
+            <span class="st-val" style="color:#d97706" id="ce">0</span>
+          </div>
+          <div class="st-icon">🚨</div>
+        </div>
+      </div>
+
+      <div class="zone-card">
+        <div class="zone-header">
+          <div class="zone-title" style="color:#dc2626; padding: 4px 10px; border-radius: 6px; background: #fef2f2;">🔴 ICU Zone — Intensive Care</div>
+        </div>
+        <div class="grid-icu" id="gicu"></div>
+      </div>
+
+      <div class="zone-card">
+        <div class="zone-header">
+          <div class="zone-title" style="color:#0ea5e9; padding: 4px 10px; border-radius: 6px; background: #f0f9ff;">🔵 General Ward</div>
+        </div>
+        <div class="grid-gen" id="ggen"></div>
+      </div>
+
+      <div class="zone-card">
+        <div class="zone-header">
+          <div class="zone-title" style="color:#8b5cf6; padding: 4px 10px; border-radius: 6px; background: #f5f3ff;">🟣 Private Suites</div>
+        </div>
+        <div class="grid-pvt" id="gpvt"></div>
+      </div>
+
+    </div>
+
+    <div class="bm-sidebar">
+      <div class="detail-panel" id="rpanel">
+        
+        <div class="empty-state" id="rem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px">Select a Bed</div>
+            <div style="font-size:13px;line-height:1.5">Click any bed node to view details or manage admission.</div>
+          </div>
+        </div>
+
+        <div id="rdet" style="display:none; height:100%; display:flex; flex-direction:column;">
+          <div class="panel-header">
+            <div class="ph-title" id="rttl">Bed Details</div>
+            <div id="rstat"></div>
+          </div>
+
+          <div class="info-grid">
+            <div class="ig-row"><span class="ig-lbl">Bed ID</span><span class="ig-val" id="rid">—</span></div>
+            <div class="ig-row"><span class="ig-lbl">Zone</span><span class="ig-val" id="rzone">—</span></div>
+          </div>
+
+          <div id="rpat" class="pat-section" style="display:none">
+            <div class="ps-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Patient Information
+            </div>
+            <div class="info-grid">
+              <div class="ig-row"><span class="ig-lbl">Name</span><span class="ig-val" id="rname">—</span></div>
+              <div class="ig-row"><span class="ig-lbl">Age</span><span class="ig-val" id="rage">—</span></div>
+              <div class="ig-row"><span class="ig-lbl">Diagnosis</span><span class="ig-val" style="color:#dc2626" id="rdiag">—</span></div>
+              <div class="ig-row"><span class="ig-lbl">Admitted</span><span class="ig-val" id="radm">—</span></div>
+              <div class="ig-row"><span class="ig-lbl">Doctor</span><span class="ig-val" id="rdoc">—</span></div>
+            </div>
+          </div>
+
+          <div class="action-row" id="ract">
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toastbox" id="tst"></div>
+
+<script>
+// Mock Patient Data
+const pts=[
+  {name:"Ramesh Kumar",age:45,diag:"BP High",adm:"15 Apr",doc:"Dr. Mehta"},
+  {name:"Aditya Kumar",age:28,diag:"Gupta Rog",adm:"10 Apr",doc:"Dr. Simranjeet"},
+  {name:"Deepak Rao",age:55,diag:"Diabetes Check",adm:"13 Apr",doc:"Dr. Rao"},
+  {name:"Sunita Devi",age:62,diag:"Chest Pain",adm:"15 Apr",doc:"Dr. Rao"},
+  {name:"Anil Sharma",age:38,diag:"Head Injury",adm:"15 Apr",doc:"Dr. Verma"},
+  {name:"Priya Singh",age:18,diag:"Fracture",adm:"14 Apr",doc:"Akshay Gupta"}
+];
+
+let pi=0, beds=[], sel=null;
+
+function mkBed(id, zone, stat){
+  return { id, zone, stat, patient: stat !== 'free' ? pts[pi++ % pts.length] : null };
+}
+
+function buildZone(cid, prefix, count, zone, stats){
+  const el = document.getElementById(cid);
+  for(let i=1; i<=count; i++){
+    const id = prefix + String(i).padStart(2,'0');
+    const s = stats[i-1] || 'free';
+    const b = mkBed(id, zone, s);
+    beds.push(b);
+    
+    const d = document.createElement('div');
+    d.className = 'bed-node ' + b.stat;
+    d.innerHTML = `<div class="b-ico"><div class="s-dot"></div></div><div class="b-id">${id}</div>`;
+    d.onclick = () => pick(b, d);
+    b.el = d;
+    el.appendChild(d);
+  }
+}
+
+// Initialize Beds
+buildZone('gicu', 'ICU-', 12, 'ICU', ['occ','occ','emg','free','occ','free','emg','free','occ','free','occ','free']);
+buildZone('ggen', 'GW-', 24, 'General', ['occ','free','occ','free','free','occ','free','occ','occ','free','free','occ','free','occ','free','occ','free','free','occ','free','free','occ','free','free']);
+buildZone('gpvt', 'PR-', 8, 'Private', ['free','occ','free','free','occ','free','occ','occ']);
+
+function upd(){
+  document.getElementById('cf').textContent = beds.filter(b=>b.stat==='free').length;
+  document.getElementById('co').textContent = beds.filter(b=>b.stat==='occ').length;
+  document.getElementById('ce').textContent = beds.filter(b=>b.stat==='emg').length;
+  document.getElementById('ct').textContent = beds.length;
+}
+upd();
+
+function showEmptyState() {
+    document.getElementById('rem').style.display = 'flex';
+    document.getElementById('rdet').style.display = 'none';
+}
+
+function pick(b, el){
+  if(sel && sel.el) sel.el.classList.remove('sel');
+  sel = b;
+  el.classList.add('sel');
+  
+  document.getElementById('rem').style.display = 'none';
+  const rdet = document.getElementById('rdet');
+  rdet.style.display = 'flex'; 
+  
+  document.getElementById('rttl').textContent = 'Bed ' + b.id;
+  document.getElementById('rid').textContent = b.id;
+  document.getElementById('rzone').textContent = b.zone;
+  
+  let badgeHtml = '';
+  if(b.stat === 'free') badgeHtml = '<div class="ph-badge" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0">Available</div>';
+  else if(b.stat === 'emg') badgeHtml = '<div class="ph-badge" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">Emergency</div>';
+  else badgeHtml = '<div class="ph-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca">Occupied</div>';
+  document.getElementById('rstat').innerHTML = badgeHtml;
+  
+  const rp = document.getElementById('rpat');
+  const ra = document.getElementById('ract');
+  
+  if(b.patient){
+    rp.style.display = 'block';
+    document.getElementById('rname').textContent = b.patient.name;
+    document.getElementById('rage').textContent = b.patient.age + ' Yrs';
+    document.getElementById('rdiag').textContent = b.patient.diag;
+    document.getElementById('radm').textContent = b.patient.adm;
+    document.getElementById('rdoc').textContent = b.patient.doc;
+    
+    ra.innerHTML = `
+      <button class="btn-act btn-disch" onclick="discharge()">Discharge</button>
+      <button class="btn-act" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0" onclick="toast('Notes feature opened')">Notes</button>
+    `;
+  } else {
+    rp.style.display = 'none';
+    ra.innerHTML = `<button class="btn-act btn-admit" onclick="admit()">Admit Patient</button>`;
+  }
+}
+
+function discharge(){
+  if(!sel) return;
+  sel.stat = 'free';
+  sel.patient = null;
+  sel.el.classList.remove('occ', 'emg', 'sel');
+  sel.el.classList.add('free');
+  upd();
+  showEmptyState();
+  sel = null;
+  toast('Patient Discharged ✓');
+}
+
+function admit(){
+  if(!sel) return;
+  const n = pts[Math.floor(Math.random() * pts.length)];
+  sel.stat = 'occ';
+  sel.patient = n;
+  sel.el.classList.remove('free');
+  sel.el.classList.add('occ');
+  upd();
+  pick(sel, sel.el);
+  toast('Admitted: ' + n.name);
+}
+
+function toast(msg){
+  const t = document.getElementById('tst');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+showEmptyState();
+</script>
+</body>
+</html>
