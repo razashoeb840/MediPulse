@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPulse - Patient History Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: #f0fdf4; color: #0f172a; min-height: 100vh; padding: 40px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; background: white; padding: 25px 35px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-left: 6px solid #10b981; }
+        .header h1 { color: #064e3b; font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .header p { color: #64748b; margin-top: 8px; font-size: 14px; font-weight: 500; }
+        
+        a.btn-back { background: #10b981; padding: 12px 24px; text-decoration: none; color: white; border-radius: 10px; font-weight: 600; font-size: 14px; transition: 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        a.btn-back:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+
+        .table-container { background: white; border-radius: 20px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #04384b; padding: 18px 24px; font-weight: 600; color: white; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: none; }
+        td { padding: 20px 24px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+        
+        .badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .bg-green { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .bg-gray { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .bg-blue { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        
+        .time-box { display: flex; flex-direction: column; gap: 6px; background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .time-item { font-size: 12px; color: #64748b; font-weight: 500; display: flex; justify-content: space-between; align-items: center;}
+        .time-val { font-weight: 700; color: #0f172a; }
+        
+        .patient-card { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 45px; height: 45px; border-radius: 12px; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1><i class="fas fa-book-medical"></i> Patient Lifecycles</h1>
+            <p>Comprehensive historical ledger of all admitted, consulted, and discharged patients.</p>
+        </div>
+        <a href="1index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Home</a>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Token</th>
+                    <th>Assigned Doctor</th>
+                    <th>Diagnosis</th>
+                    <th>Status</th>
+                    <th>Lifecycle Timeline (Registration → Consult → Departure)</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">Loading history...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        function fmtTime(dateString) {
+            if (!dateString) return '-';
+            const d = new Date(dateString);
+            return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function fmtDate(dateString) {
+            if (!dateString) return '-';
+            const d = new Date(dateString);
+            return d.toLocaleDateString();
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch(`${API_BASE}/patients/history`);
+                const data = await res.json();
+                
+                const tbody = document.getElementById('historyBody');
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No patient history found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => {
+                    let statusClass = 'bg-gray'; let icon = 'fa-clock';
+                    if(p.status === 'completed') { statusClass = 'bg-green'; icon = 'fa-check-circle'; }
+                    else if(p.status === 'prescribed') { statusClass = 'bg-blue'; icon = 'fa-prescription-bottle-alt'; }
+
+                    const initial = p.name ? p.name.charAt(0).toUpperCase() : 'P';
+                    
+                    return `
+                        <tr>
+                            <td>
+                                <div class="patient-card">
+                                    <div class="avatar">${initial}</div>
+                                    <div>
+                                        <div style="font-weight: 700; color: #0f172a; font-size:15px;">${p.name}</div>
+                                        <div style="font-size:12px; color:#64748b; font-weight:500;">Age: ${p.age}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="color: #10b981; font-weight: 800; font-size: 16px;">T-${p.token}</td>
+                            <td style="font-weight: 600;">${p.assignedDoctor ? '<i class="fas fa-stethoscope" style="color:#94a3b8; margin-right:5px;"></i> Dr. ' + p.assignedDoctor.name : '<span style="color:#94a3b8;">Unassigned</span>'}</td>
+                            <td style="color: #475569;">${p.problem}</td>
+                            <td><span class="badge ${statusClass}"><i class="fas ${icon}"></i> ${p.status.toUpperCase()}</span></td>
+                            <td>
+                                <div class="time-box">
+                                    <div class="time-item" style="border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:2px;"><i class="far fa-calendar-alt"></i> Date <span class="time-val">${fmtDate(p.createdAt)}</span></div>
+                                    <div class="time-item">Registration <span class="time-val">${fmtTime(p.createdAt)}</span></div>
+                                    <div class="time-item">Consultation <span class="time-val">${fmtTime(p.consultedAt)}</span></div>
+                                    <div class="time-item">Departed <span class="time-val">${fmtTime(p.completedAt)}</span></div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('historyBody').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: red;">Error loading history.</td></tr>';
+            }
+        }
+
+        fetchHistory();
+    </script>
+
+</body>
+</html>

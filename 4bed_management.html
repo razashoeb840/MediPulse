@@ -243,52 +243,82 @@ body{
 
 <div class="toastbox" id="tst"></div>
 
+<script src="http://localhost:5000/socket.io/socket.io.js"></script>
 <script>
-// Mock Patient Data
-const pts=[
-  {name:"Ramesh Kumar",age:45,diag:"BP High",adm:"15 Apr",doc:"Dr. Mehta"},
-  {name:"Aditya Kumar",age:28,diag:"Gupta Rog",adm:"10 Apr",doc:"Dr. Simranjeet"},
-  {name:"Deepak Rao",age:55,diag:"Diabetes Check",adm:"13 Apr",doc:"Dr. Rao"},
-  {name:"Sunita Devi",age:62,diag:"Chest Pain",adm:"15 Apr",doc:"Dr. Rao"},
-  {name:"Anil Sharma",age:38,diag:"Head Injury",adm:"15 Apr",doc:"Dr. Verma"},
-  {name:"Priya Singh",age:18,diag:"Fracture",adm:"14 Apr",doc:"Akshay Gupta"}
-];
+const socket = io('http://localhost:5000');
+let beds = [];
+let pendingPatients = [];
+let sel = null;
+const API_BASE = 'http://localhost:5000/api';
 
-let pi=0, beds=[], sel=null;
-
-function mkBed(id, zone, stat){
-  return { id, zone, stat, patient: stat !== 'free' ? pts[pi++ % pts.length] : null };
-}
-
-function buildZone(cid, prefix, count, zone, stats){
-  const el = document.getElementById(cid);
-  for(let i=1; i<=count; i++){
-    const id = prefix + String(i).padStart(2,'0');
-    const s = stats[i-1] || 'free';
-    const b = mkBed(id, zone, s);
-    beds.push(b);
-    
-    const d = document.createElement('div');
-    d.className = 'bed-node ' + b.stat;
-    d.innerHTML = `<div class="b-ico"><div class="s-dot"></div></div><div class="b-id">${id}</div>`;
-    d.onclick = () => pick(b, d);
-    b.el = d;
-    el.appendChild(d);
+socket.on('bed_updated', (updatedBed) => {
+  const index = beds.findIndex(b => b._id === updatedBed._id);
+  if (index !== -1) {
+    beds[index] = updatedBed;
+    renderAllBeds();
+    if(sel && sel._id === updatedBed._id) {
+      sel = updatedBed;
+      if(updatedBed.status === 'free') pick(null, null); // deselect if discharged
+      else pick(sel, document.getElementById('bed-'+sel._id)); 
+    }
   }
+});
+
+socket.on('patient_added', fetchPatients);
+socket.on('patient_updated', fetchPatients);
+
+async function init() {
+  await fetchPatients();
+  await fetchBeds();
 }
 
-// Initialize Beds
-buildZone('gicu', 'ICU-', 12, 'ICU', ['occ','occ','emg','free','occ','free','emg','free','occ','free','occ','free']);
-buildZone('ggen', 'GW-', 24, 'General', ['occ','free','occ','free','free','occ','free','occ','occ','free','free','occ','free','occ','free','occ','free','free','occ','free','free','occ','free','free']);
-buildZone('gpvt', 'PR-', 8, 'Private', ['free','occ','free','free','occ','free','occ','occ']);
+async function fetchPatients() {
+  try {
+    const res = await fetch(`${API_BASE}/patients`);
+    const pts = await res.json();
+    // patients who are 'waiting' and assigned a ward
+    pendingPatients = pts.filter(p => (p.status === 'waiting' || p.status === 'emergency'));
+  } catch(err){}
+}
+
+async function fetchBeds() {
+  try {
+    const res = await fetch(`${API_BASE}/beds`);
+    beds = await res.json();
+    renderAllBeds();
+  } catch(err) { console.error("Error loading beds"); }
+}
+
+function renderAllBeds() {
+  const gicu = document.getElementById('gicu');
+  const ggen = document.getElementById('ggen');
+  const gpvt = document.getElementById('gpvt');
+  gicu.innerHTML = ''; ggen.innerHTML = ''; gpvt.innerHTML = '';
+
+  beds.forEach(b => {
+    const d = document.createElement('div');
+    d.id = 'bed-' + b._id;
+    // Map backend status to UI classes
+    const statusClass = b.status === 'free' ? 'free' : (b.status === 'occ' ? 'occ' : 'emg');
+    d.className = 'bed-node ' + statusClass;
+    if(sel && sel._id === b._id) d.classList.add('sel');
+    
+    d.innerHTML = `<div class="b-ico"><div class="s-dot"></div></div><div class="b-id">${b.bedId}</div>`;
+    d.onclick = () => pick(b, d);
+
+    if(b.zone === 'ICU') gicu.appendChild(d);
+    else if(b.zone === 'General') ggen.appendChild(d);
+    else if(b.zone === 'Private') gpvt.appendChild(d);
+  });
+  upd();
+}
 
 function upd(){
-  document.getElementById('cf').textContent = beds.filter(b=>b.stat==='free').length;
-  document.getElementById('co').textContent = beds.filter(b=>b.stat==='occ').length;
-  document.getElementById('ce').textContent = beds.filter(b=>b.stat==='emg').length;
+  document.getElementById('cf').textContent = beds.filter(b=>b.status==='free').length;
+  document.getElementById('co').textContent = beds.filter(b=>b.status==='occ').length;
+  document.getElementById('ce').textContent = beds.filter(b=>b.status==='emg').length;
   document.getElementById('ct').textContent = beds.length;
 }
-upd();
 
 function showEmptyState() {
     document.getElementById('rem').style.display = 'flex';
@@ -296,7 +326,11 @@ function showEmptyState() {
 }
 
 function pick(b, el){
-  if(sel && sel.el) sel.el.classList.remove('sel');
+  if(sel && document.getElementById('bed-'+sel._id)) {
+      document.getElementById('bed-'+sel._id).classList.remove('sel');
+  }
+  if (!b) { sel = null; showEmptyState(); return; }
+
   sel = b;
   el.classList.add('sel');
   
@@ -304,59 +338,72 @@ function pick(b, el){
   const rdet = document.getElementById('rdet');
   rdet.style.display = 'flex'; 
   
-  document.getElementById('rttl').textContent = 'Bed ' + b.id;
-  document.getElementById('rid').textContent = b.id;
+  document.getElementById('rttl').textContent = 'Bed ' + b.bedId;
+  document.getElementById('rid').textContent = b.bedId;
   document.getElementById('rzone').textContent = b.zone;
   
   let badgeHtml = '';
-  if(b.stat === 'free') badgeHtml = '<div class="ph-badge" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0">Available</div>';
-  else if(b.stat === 'emg') badgeHtml = '<div class="ph-badge" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">Emergency</div>';
+  if(b.status === 'free') badgeHtml = '<div class="ph-badge" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0">Available</div>';
+  else if(b.status === 'emg') badgeHtml = '<div class="ph-badge" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a">Emergency</div>';
   else badgeHtml = '<div class="ph-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca">Occupied</div>';
   document.getElementById('rstat').innerHTML = badgeHtml;
   
   const rp = document.getElementById('rpat');
   const ra = document.getElementById('ract');
   
-  if(b.patient){
+  if(b.patient && b.status !== 'free'){
     rp.style.display = 'block';
     document.getElementById('rname').textContent = b.patient.name;
-    document.getElementById('rage').textContent = b.patient.age + ' Yrs';
-    document.getElementById('rdiag').textContent = b.patient.diag;
-    document.getElementById('radm').textContent = b.patient.adm;
-    document.getElementById('rdoc').textContent = b.patient.doc;
+    document.getElementById('rage').textContent = (b.patient.age||'--') + ' Yrs · ' + (b.patient.gender||'--');
+    document.getElementById('rdiag').textContent = b.patient.problem;
+    document.getElementById('radm').textContent = new Date(b.patient.createdAt).toLocaleDateString();
+    document.getElementById('rdoc').textContent = b.patient.doctorName||'--';
     
     ra.innerHTML = `
-      <button class="btn-act btn-disch" onclick="discharge()">Discharge</button>
-      <button class="btn-act" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0" onclick="toast('Notes feature opened')">Notes</button>
+      <button class="btn-act btn-disch" onclick="discharge()">Discharge Patient</button>
     `;
   } else {
     rp.style.display = 'none';
-    ra.innerHTML = `<button class="btn-act btn-admit" onclick="admit()">Admit Patient</button>`;
+    const waitingOptions = pendingPatients.map(p => `<option value="${p._id}">${p.name} (${p.priority})</option>`).join('');
+    
+    if (waitingOptions.length > 0) {
+      ra.innerHTML = `
+        <select id="admSelect" style="flex:2;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-family:inherit;font-size:13px;outline:none;"><option value="">Select Patient...</option>${waitingOptions}</select>
+        <button class="btn-act btn-admit" style="flex:1;" onclick="admit()">Admit</button>
+      `;
+    } else {
+      ra.innerHTML = `<div style="font-size:13px;color:#64748b;padding:10px 0;">No waiting patients in queue</div>`;
+    }
   }
 }
 
-function discharge(){
-  if(!sel) return;
-  sel.stat = 'free';
-  sel.patient = null;
-  sel.el.classList.remove('occ', 'emg', 'sel');
-  sel.el.classList.add('free');
-  upd();
-  showEmptyState();
-  sel = null;
-  toast('Patient Discharged ✓');
+async function discharge(){
+  if(!sel || !sel.patient) return;
+  try {
+    // Free the bed
+    await fetch(`${API_BASE}/beds/` + sel._id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: 'free', patient: null }) });
+    
+    // Update patient status
+    await fetch(`${API_BASE}/patients/` + sel.patient._id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: 'done' }) });
+    
+    toast('Patient Discharged ✓');
+  } catch(err) { toast('Error discharging'); }
 }
 
-function admit(){
+async function admit(){
   if(!sel) return;
-  const n = pts[Math.floor(Math.random() * pts.length)];
-  sel.stat = 'occ';
-  sel.patient = n;
-  sel.el.classList.remove('free');
-  sel.el.classList.add('occ');
-  upd();
-  pick(sel, sel.el);
-  toast('Admitted: ' + n.name);
+  const ptId = document.getElementById('admSelect') ? document.getElementById('admSelect').value : null;
+  if(!ptId) return toast('Please select a patient first');
+  
+  const pt = pendingPatients.find(p => p._id === ptId);
+  const newStatus = pt.priority === 'emergency' ? 'emg' : 'occ';
+  
+  try {
+    await fetch(`${API_BASE}/beds/` + sel._id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: newStatus, patient: ptId }) });
+    await fetch(`${API_BASE}/patients/` + ptId, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ status: 'admitted' }) });
+    
+    toast('Admitted: ' + pt.name);
+  } catch(err) { toast('Error admitting'); }
 }
 
 function toast(msg){
@@ -367,6 +414,7 @@ function toast(msg){
 }
 
 showEmptyState();
+init();
 </script>
 </body>
 </html>

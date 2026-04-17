@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPulse - Patient Self Registration</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ffffff; color: #0f172a; min-height: 100vh; }
+        
+        .split-layout { display: flex; height: 100vh; }
+        .left-panel {
+            flex: 1;
+            background-image: linear-gradient(135deg, rgba(5, 150, 105, 0.85), rgba(16, 185, 129, 0.4)), url('patient_bg.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+        .left-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.1);
+        }
+        .left-content { position: relative; z-index: 2; color: white; max-width: 500px; text-align: left; }
+        .left-content h1 { font-size: 50px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .left-content p { font-size: 18px; line-height: 1.6; color: #ecfdf5; }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 20px;
+        }
+
+        .card { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05); border: 1px solid #f1f5f9; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #059669; font-size: 24px; margin-bottom: 8px; }
+        .header p { color: #64748b; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #334155; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: #10b981; }
+        .btn-primary { width: 100%; background: #10b981; color: white; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-primary:hover { background: #059669; transform: translateY(-2px); }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
+        .modal h2 { margin-bottom: 15px; color: #0f172a; }
+        .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .pay-method { border: 2px solid #e2e8f0; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; color: #475569; }
+        .pay-method.active { border-color: #10b981; color: #10b981; background: #ecfdf5; }
+        .btn-pay { background: #0f172a; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn-pay:hover { background: #1e293b; }
+
+        .success-screen { display: none; text-align: center; }
+        .success-screen h1 { color: #10b981; font-size: 60px; margin-bottom: 10px; }
+        .token-display { font-size: 40px; font-weight: 800; color: #0f172a; background: #f1f5f9; padding: 20px; border-radius: 16px; margin: 20px 0; letter-spacing: 2px; }
+        
+        @media(max-width: 900px) {
+            .split-layout { flex-direction: column; }
+            .left-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="split-layout">
+    
+    <div class="left-panel">
+        <div class="left-content">
+            <h1>Skip the Line.<br>Register Instantly.</h1>
+            <p>Welcome to MediPulse Self-Service Portal. Tell us your symptoms and generate your OPD token right here securely.</p>
+        </div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="card" id="regCard">
+        <div class="header">
+            <h1>MediPulse Patient Portal</h1>
+            <p>Self-Register and generate your OPD Token instantly.</p>
+        </div>
+        <div id="regForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fn" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="age" placeholder="Age in years">
+            </div>
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input type="text" id="contact" placeholder="10 digit mobile number">
+            </div>
+            <div class="form-group">
+                <label>Primary Medical Issue</label>
+                <input type="text" id="problem" placeholder="What are you experiencing?">
+            </div>
+            <div class="form-group">
+                <label>Select Doctor</label>
+                <select id="doctorSelect">
+                    <option value="">Loading Doctors...</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="openPayment()">Proceed to Payment (₹ 500)</button>
+        </div>
+        <div class="success-screen" id="successScreen">
+            <h1>✓</h1>
+            <h2>Registration Successful!</h2>
+            <p style="color: #64748b; margin-top: 10px;">Please wait in the reception area. Your token number is:</p>
+            <div class="token-display" id="tokenDisplay">T-0</div>
+            <p style="font-size: 14px; color: #10b981; font-weight: 600;">Payment Verified</p>
+        </div>
+    </div>
+    </div> <!-- Close right-panel -->
+</div> <!-- Close split-layout -->
+
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <h2>Complete Payment</h2>
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Consultation Fee: ₹ 500</p>
+            <div class="payment-methods">
+                <div class="pay-method active">UPI</div>
+                <div class="pay-method">Card</div>
+                <div class="pay-method">NetBanking</div>
+            </div>
+            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 20px;">*This is a dummy payment step.</p>
+            <button class="btn-pay" onclick="processPayment()">Pay ₹ 500 & Register</button>
+            <button style="margin-top:10px; background:none; border:none; color:#ef4444; font-weight:600; cursor:pointer;" onclick="closePayment()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function loadDoctors() {
+            try {
+                const res = await fetch(`${API_BASE}/doctors`);
+                const doctors = await res.json();
+                const sel = document.getElementById('doctorSelect');
+                sel.innerHTML = '<option value="">-- Choose a Doctor --</option>' + 
+                    doctors.map(d => `<option value="${d._id}">Dr. ${d.name} (${d.specialization})</option>`).join('');
+            } catch(err) {
+                console.error(err);
+                document.getElementById('doctorSelect').innerHTML = '<option value="">Error loading doctors</option>';
+            }
+        }
+        loadDoctors();
+
+        function openPayment() {
+            const fn = document.getElementById('fn').value;
+            const age = document.getElementById('age').value;
+            const contact = document.getElementById('contact').value;
+            const problem = document.getElementById('problem').value;
+            const doc = document.getElementById('doctorSelect').value;
+
+            if(!fn || !age || !contact || !problem || !doc) {
+                alert('Please fill out all fields before proceeding to payment.');
+                return;
+            }
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePayment() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        async function processPayment() {
+            // Simulate processing
+            const btn = document.querySelector('.btn-pay');
+            btn.textContent = 'Processing...';
+            btn.style.opacity = '0.7';
+
+            setTimeout(async () => {
+                await submitRegistration();
+            }, 1000);
+        }
+
+        async function submitRegistration() {
+            const payload = {
+                name: document.getElementById('fn').value.trim(),
+                age: document.getElementById('age').value.trim(),
+                contact: document.getElementById('contact').value.trim(),
+                problem: document.getElementById('problem').value.trim(),
+                assignedDoctor: document.getElementById('doctorSelect').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/patients/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                closePayment();
+                if(data.success) {
+                    document.getElementById('regForm').style.display = 'none';
+                    document.getElementById('successScreen').style.display = 'block';
+                    document.getElementById('tokenDisplay').textContent = 'T-' + data.patient.token;
+                } else {
+                    alert('Registration failed: ' + data.error);
+                    const btn = document.querySelector('.btn-pay');
+                    btn.textContent = 'Pay ₹ 500 & Register';
+                    btn.style.opacity = '1';
+                }
+            } catch(err) {
+                alert('Connection error');
+            }
+        }
+    </script>
+</body>
+</html>

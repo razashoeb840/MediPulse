@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <title>MediPulse - Welcome</title>
-    
+
     <style>
-        /* --- SMOOTH SCROLLING ADD KIYA HAI YAHAN --- */
         html {
             scroll-behavior: smooth;
         }
@@ -23,11 +23,12 @@
             overflow-x: hidden;
         }
 
-        a, a:hover {
+        a,
+        a:hover {
             text-decoration: none;
         }
 
-        /* --- MODERN NAVBAR --- */
+
         header {
             position: absolute;
             top: 0;
@@ -44,13 +45,18 @@
             background: rgba(8, 55, 81, 0.95);
             backdrop-filter: blur(10px);
             padding: 10px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             animation: slideDown 0.5s ease;
         }
 
         @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
         }
 
         /* Sleek Flexbox layout for Header */
@@ -67,13 +73,27 @@
             color: white;
             letter-spacing: -0.5px;
         }
-        .logo span { color: #01ca8b; }
-        .logo i { color: #01ca8b; margin-right: 5px; }
+
+        .logo span {
+            color: #01ca8b;
+        }
+
+        .logo i {
+            color: #01ca8b;
+            margin-right: 5px;
+        }
 
         .menu ul {
-            padding: 0; margin: 0; display: flex; gap: 30px;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 30px;
         }
-        .menu ul li { list-style: none; }
+
+        .menu ul li {
+            list-style: none;
+        }
+
         .menu ul li a {
             color: white;
             font-size: 15px;
@@ -83,15 +103,21 @@
             position: relative;
             padding-bottom: 5px;
         }
+
         .menu ul li a::before {
             content: '';
             position: absolute;
-            width: 0; height: 2px;
+            width: 0;
+            height: 2px;
             background-color: #01ca8b;
-            bottom: 0; left: 0;
+            bottom: 0;
+            left: 0;
             transition: 0.3s ease-in-out;
         }
-        .menu ul li a:hover::before { width: 100%; }
+
+        .menu ul li a:hover::before {
+            width: 100%;
+        }
 
         .header-actions {
             display: flex;
@@ -102,7 +128,8 @@
         .social-icons a {
             color: white;
             font-size: 16px;
-            width: 35px; height: 35px;
+            width: 35px;
+            height: 35px;
             display: inline-flex;
             justify-content: center;
             align-items: center;
@@ -111,6 +138,7 @@
             transition: 0.3s;
             margin-left: 10px;
         }
+
         .social-icons a:hover {
             background: #01ca8b;
             transform: translateY(-3px);
@@ -130,7 +158,11 @@
             border: 2px solid #01ca8b;
             transition: all 0.3s ease;
         }
-        .btn-green i { margin-right: 8px; }
+
+        .btn-green i {
+            margin-right: 8px;
+        }
+
         .btn-green:hover {
             background: transparent;
             color: #01ca8b;
@@ -138,16 +170,17 @@
         }
 
         .btn-cta {
-            padding: 16px 45px; 
-            font-size: 18px; 
-            border-radius: 50px; 
-            box-shadow: 0 10px 25px rgba(1, 202, 139, 0.4); 
+            padding: 16px 45px;
+            font-size: 18px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(1, 202, 139, 0.4);
             background: #01ca8b;
             color: white;
             border: none;
         }
+
         .btn-cta:hover {
-            transform: translateY(-5px); 
+            transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(1, 202, 139, 0.6);
             background: white;
             color: #01ca8b;
@@ -155,34 +188,36 @@
 
         /* --- BANNER SECTION --- */
         .banner {
-            background-image: linear-gradient(rgba(8, 55, 81, 0.7), rgba(0, 0, 0, 0.6)), url('banner.png'); 
+            background-image: linear-gradient(rgba(8, 55, 81, 0.7), rgba(0, 0, 0, 0.6)), url('banner.png');
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
             height: 100vh;
             display: flex;
-            align-items: center; 
+            align-items: center;
         }
 
         .banner-content {
-            width: 70%; 
-            text-align: left; 
-            padding-top: 50px; 
+            width: 70%;
+            text-align: left;
+            padding-top: 50px;
         }
+
         .banner-content h1 {
             font-size: 75px;
             color: white;
             font-weight: 800;
             margin-bottom: 20px;
             line-height: 1.1;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5); 
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
         }
+
         .banner-content p {
-            color: #e1f3ff; 
-            font-size: 22px; 
+            color: #e1f3ff;
+            font-size: 22px;
             margin-bottom: 40px;
             font-weight: 400;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
 
         /* --- PRODUCT INTRODUCTION SECTION --- */
@@ -191,17 +226,19 @@
             background-color: #f4f7f6;
             position: relative;
         }
-        
+
         .section-title {
             text-align: center;
             margin-bottom: 70px;
         }
+
         .section-title h2 {
             font-size: 40px;
             font-weight: 800;
             color: #083751;
             margin-bottom: 15px;
         }
+
         .section-title p {
             font-size: 18px;
             color: #6c757d;
@@ -215,6 +252,7 @@
             transform: translateY(60px);
             transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
         }
+
         .reveal.active {
             opacity: 1;
             transform: translateY(0);
@@ -234,7 +272,7 @@
             margin-bottom: 30px;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0,0,0,0.03);
+            border: 1px solid rgba(0, 0, 0, 0.03);
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -245,7 +283,10 @@
         .product-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
             background: #01ca8b;
             opacity: 0;
             transition: 0.3s;
@@ -255,6 +296,7 @@
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
         }
+
         .product-card:hover::before {
             opacity: 1;
         }
@@ -269,14 +311,38 @@
             font-size: 28px;
             color: white;
             margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
-        .grad-1 { background: linear-gradient(135deg, #0ea5e9, #2563eb); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25); }
-        .grad-2 { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25); }
-        .grad-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25); }
-        .grad-4 { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25); }
-        .grad-5 { background: linear-gradient(135deg, #f43f5e, #be123c); box-shadow: 0 8px 20px rgba(244, 63, 94, 0.25); }
-        .grad-6 { background: linear-gradient(135deg, #14b8a6, #0f766e); box-shadow: 0 8px 20px rgba(20, 184, 166, 0.25); }
+
+        .grad-1 {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .grad-2 {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .grad-3 {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+        }
+
+        .grad-4 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+        }
+
+        .grad-5 {
+            background: linear-gradient(135deg, #f43f5e, #be123c);
+            box-shadow: 0 8px 20px rgba(244, 63, 94, 0.25);
+        }
+
+        .grad-6 {
+            background: linear-gradient(135deg, #14b8a6, #0f766e);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.25);
+        }
 
         .product-card h3 {
             font-size: 22px;
@@ -301,6 +367,7 @@
             gap: 12px;
             line-height: 1.4;
         }
+
         .feature-list li i {
             color: #01ca8b;
             font-size: 16px;
@@ -320,15 +387,18 @@
             transition: 0.3s;
             border: 1px solid #e2e8f0;
         }
+
         .btn-launch i {
             color: #01ca8b;
             transition: 0.3s;
         }
+
         .product-card:hover .btn-launch {
             background: #01ca8b;
             color: white;
             border-color: #01ca8b;
         }
+
         .product-card:hover .btn-launch i {
             color: white;
             transform: translateX(4px);
@@ -355,7 +425,7 @@
             <a href="#" class="logo">
                 <i class="fas fa-heartbeat"></i> Medi<span>Pulse</span>
             </a>
-            
+
             <nav class="menu">
                 <ul>
                     <li><a href="javascript:void(0)">Home</a></li>
@@ -370,10 +440,10 @@
                     <a href="#"><i class="fas fa-search"></i></a>
                     <a href="#"><i class="fas fa-headset"></i></a>
                 </div>
-                <a href="javascript:void(0);" class="btn-green"><i class="fas fa-calendar-check"></i> Book Demo</a>
+                <a href="8login.html" class="btn-green"><i class="fas fa-sign-in-alt"></i> Login Portal</a>
             </div>
         </div>
-    </header> 
+    </header>
 
     <section class="banner">
         <div class="container">
@@ -381,8 +451,10 @@
                 <div class="col-md-12">
                     <div class="banner-content">
                         <h1>Transform Hospital Operations Today</h1>
-                        <p style="">Experience the ultimate Hospital Management Suite. Smart Queueing, Real-Time Bed Tracking, and Seamless Admissions all in one place.</p>
-                        <a href="#dashboard-container" class="btn-cta"><i class="fas fa-rocket"></i> Launch Dashboard</a>
+                        <p style="">Experience the ultimate Hospital Management Suite. Smart Queueing, Real-Time Bed
+                            Tracking, and Seamless Admissions all in one place.</p>
+                        <a href="#dashboard-container" class="btn-cta"><i class="fas fa-rocket"></i> Launch
+                            Dashboard</a>
                     </div>
                 </div>
             </div>
@@ -391,15 +463,16 @@
 
     <section class="product-intro" id="dashboard-container">
         <div class="container">
-            
+
             <div class="section-title reveal">
                 <h2>A Complete Enterprise Solution</h2>
-                <p>Designed for modern healthcare facilities. Automate your workflows, reduce waiting times, and manage your inventory with pinpoint accuracy.</p>
+                <p>Designed for modern healthcare facilities. Automate your workflows, reduce waiting times, and manage
+                    your inventory with pinpoint accuracy.</p>
             </div>
 
             <div class="dashboard-container">
                 <div class="row">
-                    
+
                     <div class="col-md-4 reveal">
                         <div class="product-card">
                             <span class="module-status">ACTIVE</span>
@@ -410,7 +483,9 @@
                                 <li><i class="fas fa-check"></i> Automated Unique Patient ID Generation</li>
                                 <li><i class="fas fa-check"></i> Comprehensive Patient History View</li>
                             </ul>
-                            <a href="2patient.html" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="6patient_portal.html" class="btn-launch" style="margin-bottom:10px;">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Guest)</small>
+                                <i class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
+                            <!-- <a href="6patient_portal.html" class="btn-launch" style="margin-bottom:10px; background:#fffbeb; color:#d97706; border-color:#fde68a;">Patient Self-Registration <i class="fas fa-user-plus" style="color:#d97706;"></i></a> -->
                         </div>
                     </div>
 
@@ -425,7 +500,8 @@
                                 <li><i class="fas fa-check"></i> Estimated Waiting Time Calculator</li>
                                 <li><i class="fas fa-check"></i> Priority Queue for Emergency Patients</li>
                             </ul>
-                            <a href="2patient.html" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="2patient.html" class="btn-launch" onclick="checkAccess(event, 'receptionist', '2patient.html')">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Only for Receptionist)</small> <i
+                                    class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
                         </div>
                     </div>
 
@@ -439,11 +515,12 @@
                                 <li><i class="fas fa-check"></i> Live Availability Status (Available/Busy)</li>
                                 <li><i class="fas fa-check"></i> Real-time Assigned Patients List</li>
                             </ul>
-                            <a href="3doctor_module.html" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="3doctor_module.html" class="btn-launch" onclick="checkAccess(event, 'doctor', '3doctor_module.html')">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Only for Doctor)</small> <i
+                                    class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
                         </div>
                     </div>
 
-                </div> 
+                </div>
                 <div class="row mt-2">
 
                     <div class="col-md-4 reveal">
@@ -456,21 +533,22 @@
                                 <li><i class="fas fa-check"></i> Categorization (ICU / General / Private)</li>
                                 <li><i class="fas fa-check"></i> Automated Bed Allocation & Discharge System</li>
                             </ul>
-                            <a href="4bed_management.html" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="4bed_management.html" class="btn-launch" onclick="checkAccess(event, 'admin', '4bed_management.html')">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Only for Admin)</small> <i
+                                    class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
                         </div>
                     </div>
 
                     <div class="col-md-4 reveal" style="transition-delay: 0.1s;">
                         <div class="product-card">
-                            <span class="module-status">ACTIVE</span>
-                            <div class="icon-box grad-5"><i class="fas fa-file-signature"></i></div>
-                            <h3>Admission System</h3>
+                            <span class="module-status">CORE MODULE</span>
+                            <div class="icon-box grad-3"><i class="fas fa-user-shield"></i></div>
+                            <h3>Admin & Hospital Control Panel</h3>
                             <ul class="feature-list">
-                                <li><i class="fas fa-check"></i> 1-Click Admit Patient Capability</li>
-                                <li><i class="fas fa-check"></i> Auto-assign Bed based on availability</li>
-                                <li><i class="fas fa-check"></i> Maintain & Track Admission Records</li>
+                                <li><i class="fas fa-check"></i> Manage Doctors & Assign Patients</li>
+                                <li><i class="fas fa-check"></i> Monitor Hospital Operations in Real-Time</li>
+                                <li><i class="fas fa-check"></i> Control Beds, Queue & System Data</li>
                             </ul>
-                            <a href="#" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="#" class="btn-launch" onclick="checkAccess(event, 'admin', '#')">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Only for Admin)</small> <i class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
                         </div>
                     </div>
 
@@ -485,19 +563,30 @@
                                 <li><i class="fas fa-check"></i> Automated Low Stock Alerts</li>
                                 <li><i class="fas fa-check"></i> Add / Update / Delete Items functionality</li>
                             </ul>
-                            <a href="#" class="btn-launch">Explore Module <i class="fas fa-arrow-right"></i></a>
+                            <a href="5medicine.html" class="btn-launch" onclick="checkAccess(event, 'pharmacy', '5medicine.html')">Explore Module <br><small style="font-size:12px; font-weight:500; opacity:0.8; letter-spacing:0.5px;">(Only for Pharmacy)</small> <i
+                                    class="fas fa-arrow-right" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i></a>
                         </div>
                     </div>
 
-                </div> 
+                </div>
             </div>
         </div>
     </section>
 
+    <div id="toastBox" style="position:fixed; top:20px; right:-400px; background:white; color:#0f172a; padding:15px 25px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.1); border-left:4px solid #ef4444; font-family:'Poppins', sans-serif; display:flex; align-items:center; gap:15px; z-index:9999; transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); max-width: 350px;">
+        <div style="background:#fee2e2; color:#ef4444; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div>
+            <strong style="display:block; font-size:14px; margin-bottom:2px;">Access Denied</strong>
+            <span id="toastMsg" style="font-size:12px; color:#64748b; line-height:1.4; display:block;"></span>
+        </div>
+    </div>
+
     <script>
         // Sticky Header Logic
         let header = document.getElementById('main-header');
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             if (window.scrollY > 100) {
                 header.classList.add('header-active');
             } else {
@@ -518,9 +607,59 @@
                 }
             }
         }
-        
+
         window.addEventListener("scroll", reveal);
         reveal(); // Trigger once on load
+
+        // --- AUTHENTICATION & ACCESS CONTROL ---
+        const userRole = localStorage.getItem('userRole');
+        const userName = localStorage.getItem('userName');
+
+        if(userRole && userName) {
+            const loginBtn = document.querySelector('.header-actions a.btn-green');
+            if(loginBtn) {
+                // Change to Initials / User Info
+                const initial = userName.charAt(0).toUpperCase();
+                loginBtn.innerHTML = `<span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:50%; margin-right:8px;">${initial}</span> ${userName} <i class="fas fa-sign-out-alt" onclick="logout(event)" style="margin-left:8px; cursor:pointer; color:#fca5a5;" title="Logout"></i>`;
+                loginBtn.href = 'javascript:void(0)';
+                loginBtn.style.padding = '8px 20px'; // Adjust padding
+            }
+        }
+
+        function logout(e) {
+            if(e) e.stopPropagation();
+            localStorage.clear();
+            window.location.reload();
+        }
+
+        function showToast(msg, redirect = null) {
+            const tb = document.getElementById('toastBox');
+            document.getElementById('toastMsg').innerText = msg;
+            tb.style.right = '20px';
+            setTimeout(() => {
+                tb.style.right = '-400px';
+                if(redirect) window.location.href = redirect;
+            }, 3000);
+        }
+
+        function checkAccess(event, requiredRole, url) {
+            event.preventDefault();
+            
+            if(!userRole) {
+                showToast(`You must be logged in as ${requiredRole.toUpperCase()} to access this module.`, '8login.html');
+                return;
+            }
+
+            if(userRole !== requiredRole && userRole !== 'guest') {
+                showToast(`Access Denied. You are logged into a ${userRole.toUpperCase()} session. This module requires ${requiredRole.toUpperCase()} access.`);
+                return;
+            }
+
+            if(url !== '#') {
+                window.location.href = url;
+            }
+        }
     </script>
 </body>
+
 </html>

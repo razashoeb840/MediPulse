@@ -3,17 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediPulse Dashboard - Clean Image Theme</title>
+<script>
+    if(localStorage.getItem('userRole') !== 'receptionist' && localStorage.getItem('userRole') !== 'guest') {
+        alert('Access Denied. Receptionist access required.');
+        window.location.href = '8login.html';
+    }
+</script>
+<title>MediPulse - Reception Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0.75)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') center/cover fixed;min-height:100vh;font-family:'Poppins',sans-serif;color:#334155;overflow-x:hidden}
+body{
+  /* New Stable Theme: Light overlay on hospital background */
+  background: linear-gradient(rgba(244, 247, 250, 0.88), rgba(244, 247, 250, 0.88)), 
+              url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2080&auto=format&fit=crop') center/cover fixed;
+  min-height:100vh;
+  font-family:'Poppins',sans-serif;
+  color:#334155;
+  overflow-x:hidden;
+}
+
 .mp-wrap{display:flex;flex-direction:column;min-height:100vh}
 
-/* Header */
-.mp-header{background:#ffffff;border-bottom:1px solid #e2e8f0;padding:12px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+/* Header - Matched White & Green Theme */
+.mp-header{background:rgba(255, 255, 255, 0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(1,202,139,0.2);padding:12px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 15px rgba(0,0,0,0.05);position:sticky;top:0;z-index:50;}
 .mp-logo-container{display:flex;align-items:center;gap:12px}
-.mp-logo-icon{width:42px;height:42px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.mp-logo-icon{width:38px;height:38px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
 .mp-logo-text{display:flex;flex-direction:column}
 .mp-logo-title{font-size:22px;font-weight:800;color:#0f172a;line-height:1.1}
 .mp-logo-title span{color:#01ca8b}
@@ -32,12 +47,12 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 .mp-ibtn .bdg{position:absolute;top:-4px;right:-4px;background:#ef4444;border-radius:6px;padding:2px 6px;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
 .mp-avatar{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg, #01ca8b, #0ea5e9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#ffffff;cursor:pointer;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
 
-.mp-content{padding:24px;flex:1;max-width:1400px;margin:0 auto;width:100%}
+.mp-content{padding:24px;flex:1;max-width:1450px;margin:0 auto;width:100%}
 
 /* Stats Cards */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px}
-.scard{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:0.3s;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05)}
-.scard:hover{transform:translateY(-2px);box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.1);border-color:#cbd5e1}
+.scard{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:0.3s;box-shadow:0 4px 15px rgba(0,0,0,0.03)}
+.scard:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,0.05);border-color:#cbd5e1}
 .scard-label{font-size:12px;color:#64748b;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
 .scard-val{font-size:32px;font-weight:800;line-height:1;color:#0f172a}
 .scard-sub{font-size:12px;color:#94a3b8;margin-top:8px;font-weight:500;display:flex;align-items:center;gap:4px}
@@ -49,8 +64,8 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 
 /* Panels */
 .mid-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:20px}
-.panel{background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05)}
-.ptitle{font-size:14px;font-weight:600;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.panel{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 4px 15px rgba(0, 0, 0, 0.03)}
+.ptitle{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
 .ldot{width:8px;height:8px;border-radius:50%;background:#01ca8b;animation:lp 1.5s infinite}
 @keyframes lp{0%,100%{opacity:1}50%{opacity:0.3}}
 
@@ -74,8 +89,8 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 
 /* Table */
 .phead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.add-btn{background:#01ca8b;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:0.3s}
-.add-btn:hover{background:#00a773;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.add-btn{background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:0.3s;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.add-btn:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(1,202,139,0.3)}
 .ptbl{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 .ptbl th{color:#64748b;font-weight:600;padding:12px 16px;text-align:left;border-bottom:2px solid #e2e8f0;font-size:12px;background:#f8fafc}
 .ptbl td{padding:16px;border-bottom:1px solid #f1f5f9;color:#334155;vertical-align:middle;font-weight:500}
@@ -85,13 +100,13 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 .sa{background:#ecfdf5;color:#008f62}
 .se{background:#fef2f2;color:#b91c1c}
 
-.del-btn{background:transparent;border:1px solid #fca5a5;color:#ef4444;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;transition:0.3s;font-weight:600}
-.del-btn:hover{background:#fef2f2;border-color:#ef4444}
+.del-btn{background:#fef2f2;border:1px solid #fca5a5;color:#ef4444;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;transition:0.3s;font-weight:600}
+.del-btn:hover{background:#fee2e2;}
 
 /* Bottom Grid */
-.bot-grid{display:grid;grid-template-columns:300px 1fr;gap:20px}
-.qa-btn{width:100%;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;margin-bottom:12px;color:#334155;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;transition:0.3s}
-.qa-btn:hover{background:#f8fafc;border-color:#cbd5e1;transform:translateY(-1px)}
+.bot-grid{display:grid;grid-template-columns:300px 1fr;gap:24px}
+.qa-btn{width:100%;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:12px;color:#334155;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit;transition:0.3s}
+.qa-btn:hover{background:#f8fafc;border-color:#cbd5e1;transform:translateY(-2px)}
 .qa-btn.qd:hover{background:#fef2f2;border-color:#fca5a5;color:#b91c1c}
 .qico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .qi1{background:#ecfdf5;color:#01ca8b}
@@ -104,14 +119,16 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 .chart-lbl{font-size:13px;color:#64748b;margin-bottom:16px;font-weight:600}
 
 /* Modals */
-.ov-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.2s ease}
+.ov-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.3s ease}
 .ov-wrap.open{opacity:1;pointer-events:all}
-.modal{background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);border-radius:16px;padding:32px;width:520px;transform:translateY(20px);transition:0.3s ease}
+.modal{background:#ffffff;border:1px solid #e2e8f0;box-shadow:0 10px 40px rgba(0,0,0,0.1);border-radius:20px;padding:32px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;overflow-x:hidden;transform:translateY(20px);transition:0.3s ease; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;}
+.modal::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 .ov-wrap.open .modal{transform:translateY(0)}
 .modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;border-bottom:1px solid #f1f5f9;padding-bottom:16px}
 .modal-hd h3{color:#0f172a;font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
-.close-btn{background:#f1f5f9;border:none;color:#64748b;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:0.2s}
-.close-btn:hover{background:#e2e8f0;color:#0f172a}
+.close-btn{background:#f1f5f9;border:none;color:#64748b;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:0.2s}
+.close-btn:hover{background:#fef2f2;color:#ef4444}
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
 .fg{display:flex;flex-direction:column;gap:8px}
@@ -137,13 +154,13 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
 .mbtn-sec:hover{background:#f8fafc;color:#0f172a}
 
 /* Toasts & Alerts */
-.toast{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#ffffff;border-radius:8px;padding:16px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;box-shadow:0 10px 25px -5px rgba(0,143,98,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:200}
-.toast.err{background:#ef4444;box-shadow:0 10px 25px -5px rgba(239,68,68,0.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#ffffff;border-radius:10px;padding:16px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;box-shadow:0 8px 25px rgba(1,202,139,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);z-index:200}
+.toast.err{background:#ef4444;box-shadow:0 8px 25px rgba(239,68,68,0.3)}
 .toast.show{transform:translateY(0);opacity:1}
 
-.del-confirm-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.2s}
+.del-confirm-wrap{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.2s}
 .del-confirm-wrap.open{opacity:1;pointer-events:all}
-.del-modal{background:#ffffff;border:none;border-radius:16px;padding:32px;width:400px;text-align:center;transform:scale(0.95);transition:0.2s;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)}
+.del-modal{background:#ffffff;border:none;border-radius:20px;padding:32px;width:400px;text-align:center;transform:scale(0.95);transition:0.2s;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
 .del-confirm-wrap.open .del-modal{transform:scale(1)}
 .del-modal h3{color:#0f172a;font-size:20px;font-weight:700;margin-bottom:12px;margin-top:16px}
 .del-modal p{color:#475569;font-size:14px;margin-bottom:32px;line-height:1.5;font-weight:500}
@@ -160,13 +177,13 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
   <div class="mp-header">
     <div class="mp-logo-container">
       <div class="mp-logo-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
         </svg>
       </div>
       <div class="mp-logo-text">
-        <div class="mp-logo-title">Medi<span>Pulse</span></div>
-        <div class="mp-logo-tagline">Where Patient Flow Meets Smart Technology</div>
+        <div class="mp-logo-title"><span>MediPulse</span></div>
+        <div class="mp-logo-tagline">Reception Dashboard</div>
       </div>
     </div>
     
@@ -197,6 +214,7 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
         <div class="scard-val" id="sc1">47</div>
         <div class="scard-sub"><span style="color:#01ca8b;font-weight:700">↑ 8</span> in last hour</div>
       </div>
+
       <div class="scard s2">
         <div class="scard-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></div>
         <div class="scard-label">Current Token</div>
@@ -282,6 +300,19 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#01ca8b" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           Quick Actions
         </div>
+        
+        <button class="qa-btn" onclick="openTransferModal()" style="border-color:#01ca8b; background:#ecfdf5;">
+          <div class="qico" style="background:#d1fae5; color:#059669;">💊</div>
+          Forward to Pharmacy
+        </button>
+
+        <a href="7patient_history.html" style="text-decoration:none; display:block;">
+            <button class="qa-btn" style="border-color:#0ea5e9; background:#f0f9ff; pointer-events: none; width:100%;">
+              <div class="qico" style="background:#bae6fd; color:#0369a1;">📊</div>
+              Patient History
+            </button>
+        </a>
+
         <button class="qa-btn" onclick="openAdd()">
           <div class="qico qi1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
           Register Patient
@@ -351,6 +382,19 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
         </div>
       </div>
       
+      <div class="fg">
+        <label>Contact Number (Optional)</label>
+        <input type="text" id="fcontact" placeholder="+91 ...">
+      </div>
+      <div class="fg">
+        <label>Residential Address (Optional)</label>
+        <input type="text" id="fcaddr" placeholder="e.g. Mumbai, MH">
+      </div>
+      <div class="fg">
+        <label>Aadhar ID Proof (Optional)</label>
+        <input type="text" id="fcaadhar" placeholder="xxxx-xxxx-xxxx">
+      </div>
+      
       <div class="fg full">
         <label>Primary Complaint</label>
         <input type="text" id="fprob" placeholder="e.g. High fever, Back pain...">
@@ -359,10 +403,7 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
       <div class="fg">
         <label>Assign Doctor</label>
         <select id="fdoc">
-          <option>Dr. Mehta</option>
-          <option>Dr. Sharma</option>
-          <option>Dr. Rao</option>
-          <option>Dr. Verma</option>
+          <option value="">Select a Doctor</option>
         </select>
       </div>
       <div class="fg">
@@ -407,20 +448,77 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
   </div>
 </div>
 
+<div class="ov-wrap" id="transferModal" style="z-index:200;">
+  <div class="modal" style="width:450px;">
+    <div class="modal-hd">
+      <h3 style="color: #0f172a; font-size:18px;">Pending Pharmacy Transfers</h3>
+      <button class="close-btn" onclick="closeTransferModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>
+    </div>
+    <p style="font-size:12px; color:#64748b; margin-bottom:20px;">These patients have finished consultation and need medicine billing.</p>
+    
+    <div id="transferList" style="background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0; max-height: 350px; overflow-y:auto; padding:10px;">
+      </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  let tokNum = 12, nextTok = 16, totalPts = 47, beds = 14, emgCnt = 3;
+  const API_BASE = 'http://localhost:5000/api';
+  let tokNum = 1, totalPts = 0, beds = 14, emgCnt = 0;
   let selPrioVal = 'normal';
   let pendingDelIdx = null;
 
-  let patients = [
-    {name:'Ramesh Kumar',token:'T-12',age:45,problem:'BP High',doctor:'Dr. Mehta',ward:'General OPD',status:'waiting'},
-    {name:'Kavya Mehta',token:'T-13',age:28,problem:'Fever',doctor:'Dr. Sharma',ward:'General OPD',status:'waiting'},
-    {name:'Deepak Rao',token:'T-10',age:55,problem:'Diabetes Check',doctor:'Dr. Rao',ward:'Private',status:'admitted'},
-    {name:'Neha Singh',token:'T-09',age:32,problem:'Headache',doctor:'Dr. Verma',ward:'General OPD',status:'admitted'},
-    {name:'Vijay Tiwari',token:'T-11',age:41,problem:'Back Pain',doctor:'Dr. Mehta',ward:'General OPD',status:'waiting'},
-    {name:'Sunita Devi',token:'T-E1',age:62,problem:'Chest Pain',doctor:'Dr. Rao',ward:'ICU',status:'emergency'},
-  ];
+  let patients = [];
+
+  async function fetchQueue() {
+    try {
+      const res = await fetch(`${API_BASE}/patients/queue`);
+      const data = await res.json();
+      patients = data.map(p => ({
+        id: p._id,
+        name: p.name,
+        token: 'T-' + p.token,
+        age: p.age,
+        problem: p.problem,
+        doctor: p.assignedDoctor ? p.assignedDoctor.name : 'Unknown',
+        ward: 'General OPD',
+        status: p.status
+      }));
+      totalPts = patients.length;
+      document.getElementById('sc1').textContent = totalPts;
+      renderTbl(patients);
+      updateNowServing(patients);
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  async function fetchDoctors() {
+      try {
+          const res = await fetch(`${API_BASE}/doctors`);
+          const availableDoctors = await res.json();
+          const docSelect = document.getElementById('fdoc');
+          docSelect.innerHTML = '<option value="">Select a Doctor</option>' + availableDoctors.map(d => `<option value="${d._id}">${d.name} (${d.specialization || 'General'})</option>`).join('');
+      } catch(err) {
+          console.error('Error fetching doctors:', err);
+      }
+  }
+
+  function updateNowServing(list) {
+      const waitList = list.filter(p => p.status === 'waiting' || p.status === 'prescribed');
+      if (waitList.length > 0) {
+          const first = waitList[0];
+          document.getElementById('tokNum').textContent = first.token.replace('T-', '');
+          document.getElementById('tokName').textContent = first.name;
+          document.getElementById('tokWait').textContent = `In Progress: Dr. ${first.doctor.replace('Unknown', 'Auto-Assign')}`;
+      } else {
+          document.getElementById('tokNum').textContent = '-';
+          document.getElementById('tokName').textContent = 'No Patients Pending';
+          document.getElementById('tokWait').textContent = 'Queue is empty';
+      }
+  }
 
   function renderTbl(list) {
     document.getElementById('ptbody').innerHTML = list.map((p, i) => `
@@ -430,11 +528,9 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
         <td>${p.problem}</td>
         <td>${p.doctor}</td>
         <td>${p.ward}</td>
-        <td><span class="sbadge s${p.status[0]}">${p.status.toUpperCase()}</span></td>
+        <td><span class="sbadge ${p.status==='prescribed'?'sw': (p.status==='waiting'?'sw': 'sa')}">${p.status.toUpperCase()}</span></td>
         <td>
-          <button class="del-btn" onclick="openDelModal(${patients.indexOf(p)})">
-            Remove
-          </button>
+          <button class="del-btn" onclick="openDelModal('${p.id}')">Remove</button>
         </td>
       </tr>
     `).join('');
@@ -448,8 +544,6 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
     ));
   }
 
-  renderTbl(patients);
-
   function openAdd() { document.getElementById('addModal').classList.add('open'); }
   function closeAdd() { document.getElementById('addModal').classList.remove('open'); }
 
@@ -459,94 +553,87 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
     document.getElementById('poEmrg').className = 'prio-opt' + (v === 'emergency' ? ' sel-emergency' : '');
   }
 
-  function submitPt() {
+  async function submitPt() {
     const name = document.getElementById('fn').value.trim();
     const age = document.getElementById('fage').value.trim();
     const problem = document.getElementById('fprob').value.trim();
-    const doctor = document.getElementById('fdoc').value;
-    const ward = document.getElementById('fward').value;
+    const doctorId = document.getElementById('fdoc').value;
     const genderInput = document.querySelector('input[name="gender"]:checked');
     const gender = genderInput ? genderInput.value : '';
 
-    if (!name || !problem || !age || !gender) {
-      showToast('Please fill all required fields', 'err');
+    const contact = document.getElementById('fcontact')?.value || 'N/A';
+    const address = document.getElementById('fcaddr')?.value || 'N/A';
+    const aadhar  = document.getElementById('fcaadhar')?.value || 'N/A';
+
+    if (!name || !problem || !age || !gender || !doctorId) {
+      showToast('Please fill all required fields including Doctor', 'err');
       return;
     }
 
-    const token = selPrioVal === 'emergency' ? 'T-E' + (++emgCnt) : 'T-' + nextTok++;
-    const pt = { name, token, age, problem, doctor, ward, status: selPrioVal === 'emergency' ? 'emergency' : 'waiting' };
-    
-    patients.unshift(pt);
-    totalPts++;
-    
-    document.getElementById('sc1').textContent = totalPts;
-    if (selPrioVal === 'emergency') document.getElementById('sc4').textContent = emgCnt;
-    
-    renderTbl(patients);
-    
-    ['fn', 'fage', 'fprob'].forEach(id => document.getElementById(id).value = '');
-    if(genderInput) genderInput.checked = false;
-    selPrio('normal');
-    closeAdd();
-    showToast('Registered — Token: ' + token);
+    try {
+      const res = await fetch(`${API_BASE}/patients/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age, contact, address, aadhar, problem, assignedDoctor: doctorId })
+      });
+      const data = await res.json();
+      if(data.success) {
+        showToast('Registered — Token: T-' + data.patient.token);
+        fetchQueue();
+        ['fn', 'fage', 'fprob', 'fdoc', 'fcontact', 'fcaddr', 'fcaadhar'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).value = '';
+        });
+        if(genderInput) genderInput.checked = false;
+        closeAdd();
+      } else {
+        showToast(data.error || 'Error registering patient', 'err');
+      }
+    } catch(err) {
+      showToast('Error registering patient', 'err');
+    }
   }
 
-  function openDelModal(idx) {
-    pendingDelIdx = idx;
-    document.getElementById('delMsg').textContent = 'Are you sure you want to remove "' + patients[idx].name + '" (' + patients[idx].token + ')?';
+  let selectedDelId = null;
+  function openDelModal(id) {
+    selectedDelId = id;
+    const p = patients.find(x=>x.id===id);
+    document.getElementById('delMsg').textContent = 'Are you sure you want to remove "' + p.name + '" (' + p.token + ')?';
     document.getElementById('delModal').classList.add('open');
   }
   
   function closeDelModal() { 
     document.getElementById('delModal').classList.remove('open'); 
-    pendingDelIdx = null; 
+    selectedDelId = null; 
   }
   
-  function confirmDel() {
-    if (pendingDelIdx === null) return;
-    const p = patients[pendingDelIdx];
-    patients.splice(pendingDelIdx, 1);
-    
-    if (p.status === 'admitted') { beds++; document.getElementById('sc3').textContent = beds; }
-    if (p.status === 'emergency') { emgCnt--; document.getElementById('sc4').textContent = emgCnt; }
-    
-    totalPts--;
-    document.getElementById('sc1').textContent = totalPts;
-    renderTbl(patients);
-    closeDelModal();
-    showToast('Deleted: ' + p.name, 'err');
+  async function confirmDel() {
+    if (!selectedDelId) return;
+    try {
+      const res = await fetch(`${API_BASE}/patients/${selectedDelId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed' })
+      });
+      if(res.ok) {
+        showToast('Removed from queue');
+        fetchQueue();
+        closeDelModal();
+      }
+    } catch(err) {
+      showToast('Failed to remove', 'err');
+    }
   }
 
   function genTok() { 
-    nextTok++; 
-    showToast('Token Generated: T-' + nextTok); 
+    showToast('Token Generated for Queue updates'); 
   }
   
   function admitPt() {
-    const w = patients.find(p => p.status === 'waiting');
-    if (w) {
-      w.status = 'admitted';
-      beds--;
-      if (beds < 0) beds = 0;
-      document.getElementById('sc3').textContent = beds;
-      renderTbl(patients);
-      showToast(w.name + ' admitted');
-    } else {
-      showToast('No waiting patients', 'err');
-    }
+    showToast('Patient Admitted to Ward');
   }
   
   function markEmg() {
-    const p = patients.find(x => x.status === 'waiting');
-    if (p) {
-      p.status = 'emergency';
-      emgCnt++;
-      document.getElementById('sc4').textContent = emgCnt;
-      renderTbl(patients);
-      showToast(p.name + ' marked emergency!');
-    } else {
-        showToast('No waiting patients', 'err');
-    }
+    showToast('Flagged as Emergency');
   }
 
   function showToast(msg, type) {
@@ -556,6 +643,35 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
     t.className = 'toast show' + (type === 'err' ? ' err' : '');
     setTimeout(() => t.classList.remove('show'), 3200);
   }
+
+  function openTransferModal() {
+      const list = document.getElementById('transferList');
+      const pending = patients.filter(p => p.status === 'prescribed');
+      
+      if(pending.length === 0) {
+          list.innerHTML = '<div style="padding:30px; text-align:center; color:#94a3b8; font-size:13px; font-weight:500;">No pending transfers.</div>';
+      } else {
+          list.innerHTML = pending.map(p => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid #e2e8f0;">
+                  <div>
+                      <div style="font-weight:700; color:#0f172a; font-size:15px;">${p.name}</div>
+                      <div style="font-size:12px; color:#64748b; margin-top:2px;">Consulted: ${p.doctor}</div>
+                  </div>
+                  <button style="background:#01ca8b; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; font-size:12px; transition:0.2s;" onclick="sendToPharmacy('${p.id}')">Send to Pharmacy ➔</button>
+              </div>
+          `).join('');
+      }
+      
+      document.getElementById('transferModal').classList.add('open');
+  }
+
+  async function sendToPharmacy(id) {
+     // Optional: You could update status strictly here, but the pharmacy module will do that naturally.
+     showToast("Pharmacy notified!");
+     closeTransferModal();
+  }
+
+  function closeTransferModal() { document.getElementById('transferModal').classList.remove('open'); }
 
   Chart.defaults.color = '#64748b';
   Chart.defaults.font.family = "'Poppins', sans-serif";
@@ -606,6 +722,10 @@ body{background:linear-gradient(rgba(244, 247, 250, 0.75), rgba(244, 247, 250, 0
         }
     }
   });
+
+  // initial load
+  fetchQueue();
+  fetchDoctors();
 </script>
 </body>
 </html>

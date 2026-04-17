@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPulse - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: #f0fdf4; color: #0f172a; min-height: 100vh; }
+        
+        .top-nav { background: #043f77; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .logo { font-size: 24px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .logo span { color: #10b981; }
+        .logo i { color: #fca5a5; font-size: 28px; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        .container { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 28px; color: #064e3b; font-weight: 800; }
+        .page-header p { color: #64748b; font-size: 15px; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; align-items: center; border-left: 5px solid #10b981; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 20px; }
+        .stat-info h3 { font-size: 14px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-info p { font-size: 28px; color: #0f172a; font-weight: 800; }
+
+        /* Main Sections */
+        .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .panel { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .panel h3 { font-size: 18px; color: #0f172a; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+
+        /* Form */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: #10b981; }
+        
+        .btn-submit { width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-submit:hover { background: #059669; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        th { font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: 600; }
+        td { font-size: 14px; color: #334155; font-weight: 500; }
+        .role-badge { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #f1f5f9; color: #0f172a; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items:center; justify-content:center; z-index:999; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 450px; position:relative; box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #64748b; cursor: pointer; border: none; background: transparent; }
+        .close-modal:hover { color: #ef4444; }
+        
+        .action-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .btn-outline { border: 2px solid #10b981; color: #10b981; background: transparent; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-left: 10px; }
+        .btn-outline:hover { background: #ecfdf5; }
+        
+        .cat-title { font-size: 15px; color: #064e3b; margin: 25px 0 10px 0; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px;}
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i> Medi<span>Pulse</span> <span style="font-size: 16px; opacity: 0.9; font-weight: 500; color: #cbd5e1; margin-left: 5px;">| Control Center</span>
+        </div>
+        <div>
+            <span style="font-size: 14px; margin-right: 15px;">Logged in as: <strong>Admin</strong></span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1>Hospital Analytics & Staff Directory</h1>
+                <p>Live "Lekha Jokha" of total hospital metrics and secure staff registry.</p>
+            </div>
+            <div>
+                <button class="btn-outline" onclick="window.location.href='7patient_history.html'"><i class="fas fa-history"></i> Patient History</button>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-user-injured"></i></div>
+                <div class="stat-info">
+                    <h3>Total Patients</h3>
+                    <p id="stat-patients">...</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #3b82f6; background: #eff6ff;"><i class="fas fa-procedures"></i></div>
+                <div class="stat-info">
+                    <h3>Bed Occupancy</h3>
+                    <p id="stat-beds">...</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f59e0b; background: #fffbeb;"><i class="fas fa-boxes"></i></div>
+                <div class="stat-info">
+                    <h3>Inventory Value</h3>
+                    <p id="stat-inventory">₹...</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #8b5cf6; background: #f5f3ff;"><i class="fas fa-user-md"></i></div>
+                <div class="stat-info">
+                    <h3>Total Staff</h3>
+                    <p id="stat-staff">...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAFF SECTIONS -->
+        <div class="panel" style="margin-top: 20px;">
+            <div class="action-flex">
+                <h3 style="margin:0; border:none; padding:0;"><i class="fas fa-users"></i> Registered Personnel</h3>
+                <div>
+                    <button class="btn-outline" onclick="openModal('doctorModal')"><i class="fas fa-plus"></i> Add Doctor</button>
+                    <button class="btn-outline" onclick="openModal('staffModal')"><i class="fas fa-plus"></i> Add Staff</button>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <div class="cat-title"><i class="fas fa-user-md"></i> Medical Specialists (Doctors)</div>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Specialization</th></tr>
+                    </thead>
+                    <tbody id="docTableBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+                </table>
+                
+                <div class="cat-title"><i class="fas fa-desktop"></i> OPD / Reception Staff</div>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Role</th></tr>
+                    </thead>
+                    <tbody id="recTableBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+                </table>
+
+                <div class="cat-title"><i class="fas fa-pills"></i> Pharmacy & Admins</div>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Role</th></tr>
+                    </thead>
+                    <tbody id="pharTableBody"><tr><td colspan="3">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ADD DOCTOR MODAL -->
+    <div class="modal-overlay" id="doctorModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('doctorModal')">&times;</button>
+            <h3 style="margin-bottom:20px; font-size:18px; color:#0f172a;">Register New Doctor</h3>
+            <form onsubmit="registerPersonnel(event, 'doctor')">
+                <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Full Name</label>
+                        <input type="text" id="docName" placeholder="Dr. Rahul Verma" required>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Specialization</label>
+                        <input type="text" id="docSpec" placeholder="e.g. Cardiology" required>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Qualifications</label>
+                        <input type="text" id="docQual" placeholder="e.g. MBBS, MD" required>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Experience (Years)</label>
+                        <input type="number" id="docExp" placeholder="e.g. 5" min="0" required>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Contact Number (Optional)</label>
+                        <input type="text" id="docPhone" placeholder="+91 ...">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Residential Address (Optional)</label>
+                        <input type="text" id="docAddr" placeholder="e.g. Mumbai, MH">
+                    </div>
+                    <div class="form-group" style="margin:0; grid-column:1/-1;">
+                        <label>Aadhar ID Proof (Optional)</label>
+                        <input type="text" id="docAadhar" placeholder="xxxx-xxxx-xxxx">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="btn-doctor">Assign ID & Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD STAFF MODAL -->
+    <div class="modal-overlay" id="staffModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('staffModal')">&times;</button>
+            <h3 style="margin-bottom:20px; font-size:18px; color:#0f172a;">Register Core Staff</h3>
+            <form onsubmit="registerPersonnel(event, 'staff')">
+                <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div class="form-group" style="margin:0;">
+                        <label>System Role *</label>
+                        <select id="staffRole" required style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:12px; outline:none;">
+                            <option value="">-- Choose Role --</option>
+                            <option value="admin">Administrator</option>
+                            <option value="receptionist">Receptionist</option>
+                            <option value="pharmacy">Pharmacy Control</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Full Name *</label>
+                        <input type="text" id="staffName" placeholder="e.g. Priya Desai" required>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Contact Number (Optional)</label>
+                        <input type="text" id="staffPhone" placeholder="+91 ...">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Residential Address (Optional)</label>
+                        <input type="text" id="staffAddr" placeholder="e.g. Pune, MH">
+                    </div>
+                    <div class="form-group" style="margin:0; grid-column:1/-1;">
+                        <label>Aadhar ID Proof (Optional)</label>
+                        <input type="text" id="staffAadhar" placeholder="xxxx-xxxx-xxxx">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="btn-staff">Assign ID & Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/admin';
+
+        // Security
+        if(localStorage.getItem('userRole') !== 'admin' && localStorage.getItem('userRole') !== 'guest') {
+            alert('Access Denied. Admin Dashboard.');
+            window.location.href = '8login.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '8login.html';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch(`${API_BASE}/stats`);
+                const data = await res.json();
+                
+                document.getElementById('stat-patients').innerText = data.patients;
+                document.getElementById('stat-beds').innerText = data.bedOccupancyPercentage + '%';
+                document.getElementById('stat-inventory').innerText = '₹' + data.inventoryValue.toLocaleString();
+                document.getElementById('stat-staff').innerText = (data.doctors + data.staff);
+            } catch(e) {
+                console.error('Failed to load stats', e);
+            }
+        }
+
+        async function fetchStaff() {
+            try {
+                const res = await fetch(`${API_BASE}/staff`);
+                const staff = await res.json();
+                
+                const docTbody = document.getElementById('docTableBody');
+                const recTbody = document.getElementById('recTableBody');
+                const pharTbody = document.getElementById('pharTableBody');
+                
+                docTbody.innerHTML = '';
+                recTbody.innerHTML = '';
+                pharTbody.innerHTML = '';
+                
+                staff.forEach(s => {
+                    const tr = `<tr>
+                        <td style="color:#059669; font-weight:700; width:120px;">${s.id}</td>
+                        <td>${s.name}</td>
+                        <td><span class="role-badge">${s.role}</span></td>
+                    </tr>`;
+
+                    if(s.id.startsWith('DOC')) {
+                        docTbody.innerHTML += tr;
+                    } else if(s.id.startsWith('REC')) {
+                        recTbody.innerHTML += tr;
+                    } else {
+                        pharTbody.innerHTML += tr;
+                    }
+                });
+            } catch(e) {
+                console.error('Failed to load staff list', e);
+            }
+        }
+
+        async function registerPersonnel(event, type) {
+            event.preventDefault();
+            
+            let payload = {};
+            let btnId = '';
+
+            if(type === 'doctor') {
+                payload = { 
+                    role: 'doctor', 
+                    name: document.getElementById('docName').value, 
+                    specialization: document.getElementById('docSpec').value,
+                    qualifications: document.getElementById('docQual').value,
+                    experience: document.getElementById('docExp').value,
+                    contactNumber: document.getElementById('docPhone').value,
+                    address: document.getElementById('docAddr').value,
+                    aadhar: document.getElementById('docAadhar').value
+                };
+                btnId = 'btn-doctor';
+            } else {
+                payload = { 
+                    role: document.getElementById('staffRole').value, 
+                    name: document.getElementById('staffName').value,
+                    contactNumber: document.getElementById('staffPhone').value,
+                    address: document.getElementById('staffAddr').value,
+                    aadhar: document.getElementById('staffAadhar').value
+                };
+                btnId = 'btn-staff';
+            }
+
+            const btn = document.getElementById(btnId);
+            btn.innerHTML = 'Registering...';
+
+            try {
+                const res = await fetch(`${API_BASE}/register-staff`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                if(data.success) {
+                    alert(`Successfully registered! Initialized ID: ${data.user.doctorId || data.user.staffId}`);
+                    event.target.reset();
+                    closeModal(type === 'doctor' ? 'doctorModal' : 'staffModal');
+                    fetchStaff();
+                    fetchStats();
+                    window.location.reload(); // Force hot reload for all UI components
+                } else {
+                    alert('Registration failed');
+                }
+            } catch(e) {
+                alert('Connection Error to Backend');
+            }
+            btn.innerHTML = 'Assign ID & Register';
+        }
+
+        // Initialize Page
+        fetchStats();
+        fetchStaff();
+
+        // Real-time MongoDB Polling (every 5 seconds)
+        setInterval(fetchStats, 5000);
+        setInterval(fetchStaff, 5000);
+    </script>
+</body>
+</html>

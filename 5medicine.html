@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPulse - Smart Pharmacy POS</title>
+<script>
+    if(localStorage.getItem('userRole') !== 'pharmacy' && localStorage.getItem('userRole') !== 'guest') {
+        alert('Access Denied. Pharmacy access required.');
+        window.location.href = '8login.html';
+    }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background: linear-gradient(rgba(244, 247, 250, 0.88), rgba(244, 247, 250, 0.88)), 
+              url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2080&auto=format&fit=crop') center/cover fixed;
+  min-height:100vh;
+  font-family:'Poppins',sans-serif;
+  color:#334155;
+  overflow-x:hidden;
+}
+
+.mp-wrap{display:flex;flex-direction:column;height:100vh}
+
+/* Header */
+.mp-header{background:rgba(255, 255, 255, 0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(1,202,139,0.2);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50;box-shadow:0 2px 15px rgba(0,0,0,0.05)}
+.mp-logo-container{display:flex;align-items:center;gap:12px}
+.mp-logo-icon{width:38px;height:38px;background:linear-gradient(135deg, #01ca8b, #008f62);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.mp-logo-title{font-size:22px;font-weight:800;color:#0f172a;line-height:1.1}
+.mp-logo-title span{color:#01ca8b}
+.mp-logo-tagline{font-size:10.5px;color:#64748b;font-weight:500;letter-spacing:0.5px}
+
+.mp-hactions{margin-left:auto;display:flex;align-items:center;gap:16px}
+.live-badge{background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;padding:6px 12px;border-radius:50px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.live-dot{width:8px;height:8px;background:#059669;border-radius:50%;animation:pulse-live 1.5s infinite}
+.mp-avatar{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg, #01ca8b, #0ea5e9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#ffffff;cursor:pointer}
+
+@keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Main Layout */
+.pos-layout{display:flex;gap:24px;padding:24px;max-width:1600px;margin:0 auto;width:100%;height:calc(100vh - 65px)}
+
+/* Left Side: Inventory */
+.inventory-section{flex:1;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-right:10px}
+
+/* Sales Stats Bar */
+.sales-bar{display:flex;gap:16px;background:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.03);border:1px solid #e2e8f0;align-items:center}
+.sale-stat{flex:1;display:flex;flex-direction:column;border-right:1px solid #e2e8f0;padding-right:16px}
+.sale-stat:last-child{border-right:none;padding-right:0}
+.sale-lbl{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.sale-val{font-size:20px;font-weight:800;color:#0f172a;margin-top:2px}
+.sale-val.today{color:#01ca8b}
+
+.btn-history{background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:0.2s;display:flex;align-items:center;gap:6px}
+.btn-history:hover{background:#f1f5f9;border-color:#cbd5e1}
+
+/* Controls & Filters */
+.section-header{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.03);border:1px solid #e2e8f0;flex-wrap:wrap;gap:12px}
+.filter-row{display:flex;gap:8px}
+.flt-btn{background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;padding:8px 16px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;transition:0.2s;font-family:inherit}
+.flt-btn:hover{background:#f1f5f9}
+.flt-btn.active{background:#01ca8b;color:#fff;border-color:#008f62;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+
+.sh-actions{display:flex;align-items:center;gap:12px; flex-wrap:wrap;}
+.search-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 16px;display:flex;align-items:center;gap:8px;width:240px;transition:0.3s}
+.search-box:focus-within{border-color:#01ca8b;background:#fff;box-shadow:0 0 0 3px rgba(1,202,139,0.1)}
+.search-box input{border:none;background:none;outline:none;width:100%;font-family:inherit;font-size:13px;color:#0f172a}
+
+.btn-prescriptions{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:0.2s;}
+.btn-prescriptions:hover{background:#fee2e2;}
+
+.btn-add-new{background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:0.2s;box-shadow:0 4px 10px rgba(1,202,139,0.2)}
+.btn-add-new:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(1,202,139,0.3)}
+
+/* Medicine Grid */
+.med-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(290px, 1fr));gap:16px;padding-bottom:20px}
+.med-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,0.03);transition:0.2s;position:relative;overflow:hidden}
+.med-card:hover{transform:translateY(-3px);border-color:#01ca8b;box-shadow:0 8px 20px rgba(1,202,139,0.1)}
+
+/* Types Badges */
+.type-badge{position:absolute;top:0;right:0;padding:4px 12px;font-size:10px;font-weight:700;border-bottom-left-radius:12px;text-transform:uppercase;letter-spacing:0.5px}
+.type-emg{background:#fef2f2;color:#dc2626;border-left:1px solid #fca5a5;border-bottom:1px solid #fca5a5}
+.type-daily{background:#eff6ff;color:#2563eb;border-left:1px solid #bfdbfe;border-bottom:1px solid #bfdbfe}
+.type-normal{background:#f8fafc;color:#64748b;border-left:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
+.type-other{background:#fff7ed;color:#d97706;border-left:1px solid #fde68a;border-bottom:1px solid #fde68a}
+
+.med-head{display:flex;justify-content:space-between;align-items:flex-start;margin-top:8px}
+.med-name{font-size:15px;font-weight:700;color:#0f172a}
+.med-illness{font-size:12px;color:#01ca8b;font-weight:600;margin-top:2px}
+.med-price{font-size:16px;font-weight:800;color:#0f172a; display:flex; flex-direction:column; align-items:flex-end;}
+.med-unit-lbl{font-size:10px; color:#94a3b8; font-weight:500;}
+
+.med-stock-info{background:#f8fafc;border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #f1f5f9}
+.stock-val{font-size:13px;font-weight:700;color:#334155;display:flex;flex-direction:column}
+.stock-lbl{font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase}
+.depletion{font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
+.dep-safe{color:#059669}
+.dep-warn{color:#d97706}
+.dep-danger{color:#dc2626}
+
+.card-actions { display: flex; gap: 8px; }
+.add-btn{flex:1; background:rgba(1,202,139,0.1);color:#008f62;border:1px solid rgba(1,202,139,0.2);border-radius:8px;padding:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-btn:hover{background:#01ca8b;color:#fff}
+.add-btn:disabled{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0;cursor:not-allowed}
+
+.edit-stock-btn { width: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: 0.2s; }
+.edit-stock-btn:hover { background: #e2e8f0; color: #0f172a; }
+
+/* Right Side: Billing/Cart */
+.billing-section{width:420px;background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.06);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.bill-header{background:#f8fafc;padding:20px;border-bottom:1px solid #e2e8f0;text-align:center}
+.bill-title{font-size:18px;font-weight:800;color:#0f172a;letter-spacing:0.5px}
+.bill-subtitle{font-size:13px;color:#01ca8b;font-weight:700;margin-top:4px} /* Updated to highlight patient name */
+
+.cart-items{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.cart-empty{text-align:center;color:#94a3b8;margin:auto;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:13px;font-weight:500}
+
+.cart-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px dashed #e2e8f0}
+.ci-details{flex:1}
+.ci-name{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.ci-price{font-size:11px;color:#64748b}
+.ci-controls{display:flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:4px}
+.qty-btn{width:24px;height:24px;border:none;background:#fff;border-radius:6px;cursor:pointer;font-weight:700;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;transition:0.2s}
+.qty-btn:hover{background:#01ca8b;color:#fff}
+.ci-qty{font-size:13px;font-weight:700;width:20px;text-align:center}
+.ci-total{font-size:14px;font-weight:800;color:#0f172a;min-width:60px;text-align:right}
+
+/* Bill Totals - Simplified */
+.bill-summary{background:#f8fafc;padding:20px;border-top:1px solid #e2e8f0}
+.summary-row.grand-total{font-size:20px;color:#0f172a;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.grand-total span:last-child{color:#01ca8b}
+
+.checkout-btn{width:100%;background:linear-gradient(135deg, #01ca8b, #008f62);color:#fff;border:none;border-radius:12px;padding:16px;font-family:inherit;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 20px rgba(1,202,139,0.3);transition:0.3s;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.checkout-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(1,202,139,0.4)}
+.checkout-btn:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed;transform:none}
+
+/* Modals */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.3s ease}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal-content{background:#fff;border-radius:20px;padding:32px;width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.1);transform:translateY(20px);transition:0.3s ease}
+.modal-content.wide{width:600px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-header h3{font-size:18px;color:#0f172a;font-weight:700}
+.modal-close{background:none;border:none;font-size:20px;color:#94a3b8;cursor:pointer;transition:0.2s}
+.modal-close:hover{color:#ef4444}
+.modal-body{display:flex;flex-direction:column;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group label{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase}
+.form-group input, .form-group select{padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;outline:none;transition:0.2s}
+.form-group input:focus, .form-group select:focus{border-color:#01ca8b;box-shadow:0 0 0 3px rgba(1,202,139,0.1)}
+.modal-actions{display:flex;gap:12px;margin-top:24px}
+.btn-save{flex:1;background:#01ca8b;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:600;cursor:pointer;transition:0.2s}
+.btn-save:hover{background:#00a773}
+.btn-cancel{flex:1;background:#f1f5f9;color:#64748b;border:none;padding:12px;border-radius:8px;font-weight:600;cursor:pointer;transition:0.2s}
+.btn-cancel:hover{background:#e2e8f0;color:#0f172a}
+
+/* Sales History & RX Tables */
+.history-table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+.history-table th{background:#f8fafc;padding:12px;color:#64748b;font-weight:600;border-bottom:1px solid #e2e8f0}
+.history-table td{padding:12px;border-bottom:1px solid #f1f5f9;color:#0f172a;font-weight:500}
+.history-empty{text-align:center;padding:30px;color:#94a3b8;font-size:14px}
+
+.rx-item { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
+
+/* Toast */
+.toastbox{position:fixed;bottom:24px;right:24px;background:#01ca8b;color:#ffffff;border-radius:10px;padding:14px 24px;font-size:14px;font-weight:600;box-shadow:0 8px 25px rgba(1,202,139,0.3);transform:translateY(100px);opacity:0;transition:0.4s cubic-bezier(0.175,0.885,0.32,1.275);z-index:999}
+.toastbox.err{background:#ef4444;box-shadow:0 8px 25px rgba(239,68,68,0.3)}
+.toastbox.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="mp-wrap">
+  <div class="mp-header">
+    <div class="mp-logo-container">
+      <div class="mp-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
+      </div>
+      <div class="mp-logo-text">
+        <div class="mp-logo-title">City<span>MediPulse</span></div>
+        <div class="mp-logo-tagline">Smart Pharmacy POS</div>
+      </div>
+    </div>
+    
+    <div class="mp-hactions">
+      <div class="live-badge"><div class="live-dot"></div> System Synced</div>
+      <div class="mp-avatar">SR</div>
+    </div>
+  </div>
+
+  <div class="pos-layout">
+    
+    <div class="inventory-section">
+      
+      <div class="sales-bar">
+        <div class="sale-stat">
+          <span class="sale-lbl">Today's Revenue</span>
+          <span class="sale-val today" id="salesToday">₹0.00</span>
+        </div>
+        <div class="sale-stat">
+          <span class="sale-lbl">Yesterday</span>
+          <span class="sale-val">₹4,520.50</span>
+        </div>
+        <button class="btn-history" onclick="openHistoryModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          View Sales History
+        </button>
+      </div>
+
+      <div class="section-header">
+        <div class="filter-row">
+          <button class="flt-btn active" onclick="filterType('All', this)">All</button>
+          <button class="flt-btn" onclick="filterType('Emergency', this)">🚨 Emergency</button>
+          <button class="flt-btn" onclick="filterType('Daily Use', this)">📅 Daily Use</button>
+          <button class="flt-btn" onclick="filterType('Normal', this)">💊 Normal</button>
+        </div>
+        <div class="sh-actions">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search by name or illness..." onkeyup="searchInventory()">
+          </div>
+          <button class="btn-prescriptions" onclick="openPrescriptionModal()">
+            📥 Load Prescriptions
+          </button>
+          <button class="btn-add-new" onclick="openAddMedModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Medicine
+          </button>
+        </div>
+      </div>
+
+      <div class="med-grid" id="medGrid">
+        </div>
+    </div>
+
+    <div class="billing-section">
+      <div class="bill-header">
+        <div class="bill-title">Current Invoice</div>
+        <div class="bill-subtitle" id="billedPatientName">Walk-in Customer</div>
+      </div>
+
+      <div class="cart-items" id="cartContainer">
+        <div class="cart-empty" id="emptyCartMsg">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          No medicines added to bill yet.<br>Select items from inventory to begin.
+        </div>
+      </div>
+
+      <div class="bill-summary">
+        <div class="summary-row grand-total">
+          <span>Total Amount</span>
+          <span id="totalAmt">₹0.00</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn" onclick="checkout()" disabled>
+          Complete Sale
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="stockModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalMedName">Edit Medicine</h3>
+      <button class="modal-close" onclick="closeModal('stockModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modalMedId">
+      
+      <div class="form-group">
+        <label>Price Per Unit (₹)</label>
+        <input type="number" id="modalMedPrice" step="0.01">
+      </div>
+
+      <div class="form-group" style="margin-top:8px;">
+        <label>Current Stock</label>
+        <input type="number" id="modalCurrentStock" readonly style="background:#f1f5f9; color:#64748b; cursor:not-allowed;">
+      </div>
+      <div class="form-group">
+        <label>Add/Remove Quantity</label>
+        <input type="number" id="modalStockChange" placeholder="e.g. 50 or -10">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('stockModal')">Cancel</button>
+      <button class="btn-save" onclick="saveStock()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addMedModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add New Medicine</h3>
+      <button class="modal-close" onclick="closeModal('addMedModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Medicine Name</label>
+        <input type="text" id="newMedName" placeholder="e.g. Dolo 650">
+      </div>
+      <div class="form-group">
+        <label>Used For (Illness/Condition)</label>
+        <input type="text" id="newMedIllness" placeholder="e.g. Fever, Body Ache">
+      </div>
+      <div class="form-group">
+        <label>Category Type</label>
+        <select id="newMedType" onchange="toggleOtherType()">
+          <option value="Normal">Normal 💊</option>
+          <option value="Daily Use">Daily Use 📅</option>
+          <option value="Emergency">Emergency 🚨</option>
+          <option value="Other">Other...</option>
+        </select>
+      </div>
+      <div class="form-group" id="otherTypeGroup" style="display:none;">
+        <label>Custom Category Name</label>
+        <input type="text" id="newMedCustomType" placeholder="e.g. Vaccine, Surgery">
+      </div>
+      <div style="display:flex; gap:12px;">
+        <div class="form-group" style="flex:1;">
+          <label>Price Per Unit (₹)</label>
+          <input type="number" id="newMedPrice" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Initial Stock</label>
+          <input type="number" id="newMedStock" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Estimated Sales/Day (For Alert)</label>
+        <input type="number" id="newMedSales" placeholder="e.g. 5" value="5">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('addMedModal')">Cancel</button>
+      <button class="btn-save" onclick="saveNewMedicine()">Add Medicine</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-content wide">
+    <div class="modal-header">
+      <h3>Sales History Ledger</h3>
+      <button class="modal-close" onclick="closeModal('historyModal')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height: 400px; overflow-y:auto; padding-right:5px;">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Medicine Name</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody id="historyTbody">
+          </tbody>
+      </table>
+      <div id="historyEmpty" class="history-empty">
+        No sales recorded yet. Complete a sale to see it here.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rxModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Incoming Patients (From Reception)</h3>
+      <button class="modal-close" onclick="closeModal('rxModal')">✕</button>
+    </div>
+    <div class="modal-body" id="rxList" style="max-height: 400px; overflow-y: auto;">
+      </div>
+  </div>
+</div>
+
+<div class="toastbox" id="tst"></div>
+
+<script>
+const API_BASE = 'http://localhost:5000/api';
+let inventory = [];
+let cart = [];
+let salesHistory = []; 
+let todaySalesTotal = 0;
+let currentFilter = 'All';
+let currentRxPatientId = null; 
+
+async function fetchInventory() {
+  try {
+    const res = await fetch(`${API_BASE}/medicines`);
+    const data = await res.json();
+    inventory = data.map(m => ({
+      id: m._id,
+      name: m.name,
+      illness: "General",
+      type: m.category || "Normal",
+      stock: m.stock,
+      price: m.price || 15.00,
+      salesPerDay: 5
+    }));
+    applyFilters();
+  } catch(err) {
+    console.error(err);
+    toast('Error loading inventory from server', 'error');
+  }
+}
+
+function getTypeClass(type) {
+    if(type === 'Emergency') return 'type-emg';
+    if(type === 'Daily Use') return 'type-daily';
+    if(type === 'Normal') return 'type-normal';
+    return 'type-other';
+}
+
+function getTypeIcon(type) {
+    if(type === 'Emergency') return '🚨';
+    if(type === 'Daily Use') return '📅';
+    if(type === 'Normal') return '💊';
+    return '📌';
+}
+
+function renderInventory(data = inventory) {
+  const grid = document.getElementById('medGrid');
+  grid.innerHTML = '';
+
+  data.forEach(med => {
+    let daysLeft = Math.floor(med.stock / med.salesPerDay);
+    let depClass = 'dep-safe';
+    let depText = `Ends in ~${daysLeft} days`;
+    let depIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+
+    if(med.stock <= 0) {
+      depClass = 'dep-danger';
+      depText = 'Out of Stock!';
+      depIcon = '⚠️';
+      med.stock = 0; 
+    } else if(daysLeft <= 5) {
+      depClass = 'dep-danger';
+      depText = `Ends soon (~${daysLeft} days)`;
+      depIcon = '🔥';
+    } else if(daysLeft <= 15) {
+      depClass = 'dep-warn';
+      depText = `Running low (~${daysLeft} days)`;
+    }
+
+    const typeClass = getTypeClass(med.type);
+    const typeIcon = getTypeIcon(med.type);
+
+    const html = `
+      <div class="med-card">
+        <div class="type-badge ${typeClass}">${typeIcon} ${med.type}</div>
+        <div class="med-head">
+          <div>
+            <div class="med-name">${med.name}</div>
+            <div class="med-illness">For: ${med.illness}</div>
+          </div>
+          <div class="med-price">
+            ₹${med.price.toFixed(2)}
+            <span class="med-unit-lbl">per unit</span>
+          </div>
+        </div>
+        <div class="med-stock-info">
+          <div class="stock-val">
+            <span class="stock-lbl">Current Stock</span>
+            <span style="font-size:16px; color:${med.stock===0?'#dc2626':'#0f172a'}">${med.stock} Units</span>
+          </div>
+          <div class="depletion ${depClass}">
+            ${depIcon} ${depText}
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="add-btn" onclick="addToCart('${med.id}')" ${med.stock === 0 ? 'disabled' : ''}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add to Bill
+          </button>
+          <button class="edit-stock-btn" onclick="toast('Edit stock disabled in server mode', 'error')" title="Edit Price & Stock">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+        </div>
+      </div>
+    `;
+    grid.innerHTML += html;
+  });
+}
+
+function filterType(type, btnElement) {
+    currentFilter = type;
+    document.querySelectorAll('.flt-btn').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+    applyFilters();
+}
+
+function searchInventory() { applyFilters(); }
+
+function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = inventory;
+    
+    if(currentFilter !== 'All') {
+        filtered = filtered.filter(m => m.type === currentFilter);
+    }
+    if(q !== '') {
+        filtered = filtered.filter(m => m.name.toLowerCase().includes(q) || m.illness.toLowerCase().includes(q) || m.type.toLowerCase().includes(q));
+    }
+    renderInventory(filtered);
+}
+
+function addToCart(id) {
+  const item = inventory.find(i => i.id === id);
+  const cartItem = cart.find(c => c.id === id);
+  const currentQtyInCart = cartItem ? cartItem.qty : 0;
+
+  if (currentQtyInCart >= item.stock) {
+    toast('Max stock limit reached for this item!', 'error');
+    return;
+  }
+
+  if (cartItem) {
+    cartItem.qty++;
+  } else {
+    cart.push({ ...item, qty: 1 });
+  }
+  
+  renderCart();
+  toast(`${item.name} added to bill.`);
+}
+
+function updateQty(id, change) {
+  const cartItem = cart.find(c => c.id === id);
+  const inventoryItem = inventory.find(i => i.id === id);
+
+  if (change > 0 && cartItem.qty >= inventoryItem.stock) {
+    toast('Cannot exceed available stock!', 'error');
+    return;
+  }
+
+  cartItem.qty += change;
+  if (cartItem.qty <= 0) {
+    cart = cart.filter(c => c.id !== id);
+  }
+  renderCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContainer');
+  const emptyMsg = document.getElementById('emptyCartMsg');
+  const btn = document.getElementById('checkoutBtn');
+
+  Array.from(container.children).forEach(child => {
+    if(child.id !== 'emptyCartMsg') child.remove();
+  });
+
+  let total = 0;
+
+  if (cart.length === 0) {
+    emptyMsg.style.display = 'flex';
+    btn.disabled = true;
+  } else {
+    emptyMsg.style.display = 'none';
+    btn.disabled = false;
+
+    cart.forEach(c => {
+      const itemTotal = c.price * c.qty;
+      total += itemTotal;
+
+      const html = `
+        <div class="cart-item">
+          <div class="ci-details">
+            <div class="ci-name">${c.name}</div>
+            <div class="ci-price">₹${c.price.toFixed(2)} x ${c.qty}</div>
+          </div>
+          <div class="ci-controls">
+            <button class="qty-btn" onclick="updateQty('${c.id}', -1)">-</button>
+            <div class="ci-qty">${c.qty}</div>
+            <button class="qty-btn" onclick="updateQty('${c.id}', 1)">+</button>
+          </div>
+          <div class="ci-total">₹${itemTotal.toFixed(2)}</div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  window.currentTotal = total;
+  document.getElementById('totalAmt').textContent = `₹${total.toFixed(2)}`;
+}
+
+async function checkout() {
+  if(cart.length === 0) return;
+  
+  const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+  try {
+    const saleItems = cart.map(c => ({ name: c.name, quantity: c.qty }));
+    
+    const res = await fetch(`${API_BASE}/medicines/sell`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: saleItems })
+    });
+    
+    if(!res.ok) {
+       const data = await res.json();
+       toast('Error correctly processing sale. Do not use invalid names.', 'error');
+       return;
+    }
+
+    cart.forEach(cItem => {
+      const invItem = inventory.find(i => i.id === cItem.id);
+      invItem.stock -= cItem.qty; 
+      
+      salesHistory.push({
+          time: now,
+          name: cItem.name,
+          price: cItem.price,
+          qty: cItem.qty,
+          total: (cItem.price * cItem.qty).toFixed(2)
+      });
+    });
+
+    todaySalesTotal += window.currentTotal;
+    document.getElementById('salesToday').textContent = `₹${todaySalesTotal.toFixed(2)}`;
+
+    // Update patient status to 'completed'
+    if(currentRxPatientId) {
+       await fetch(`${API_BASE}/patients/${currentRxPatientId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'completed' })
+       });
+    }
+
+    cart = [];
+    currentRxPatientId = null;
+    document.getElementById('billedPatientName').textContent = "Walk-in Customer";
+    
+    renderCart();
+    applyFilters(); // will re-render stock
+    
+    // Completely refresh inventory to align with DB
+    await fetchInventory();
+
+    toast('Sale Completed! Data logged to history ✓');
+  } catch(err) {
+    console.error(err);
+    toast('Network Error', 'error');
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function openHistoryModal() {
+    const tbody = document.getElementById('historyTbody');
+    const emptyMsg = document.getElementById('historyEmpty');
+    
+    tbody.innerHTML = '';
+    
+    if(salesHistory.length === 0) {
+        emptyMsg.style.display = 'block';
+    } else {
+        emptyMsg.style.display = 'none';
+        
+        [...salesHistory].reverse().forEach(record => {
+            tbody.innerHTML += `
+                <tr>
+                    <td style="color:#64748b">${record.time}</td>
+                    <td style="font-weight:700">${record.name}</td>
+                    <td>${record.qty}</td>
+                    <td style="color:#64748b">₹${record.price.toFixed(2)}</td>
+                    <td style="color:#01ca8b; font-weight:700">₹${record.total}</td>
+                </tr>
+            `;
+        });
+    }
+    document.getElementById('historyModal').classList.add('active');
+}
+
+async function openPrescriptionModal() {
+    const list = document.getElementById('rxList');
+    list.innerHTML = '<div style="padding:20px; text-align:center;">Loading...</div>';
+    document.getElementById('rxModal').classList.add('active');
+
+    try {
+      window.rxStore = {}; // Initialize store
+      const res = await fetch(`${API_BASE}/patients/queue`);
+      const patients = await res.json();
+      
+      const pendingPts = patients.filter(p => p.status === 'prescribed');
+      
+      if(pendingPts.length === 0) {
+          list.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8;">No pending patients from reception.</div>';
+          return;
+      }
+      
+      let html = '';
+      for(let p of pendingPts) {
+        const rxRes = await fetch(`${API_BASE}/prescriptions/patient/${p._id}`);
+        if(rxRes.ok) {
+           const rxData = await rxRes.json();
+           const rx = rxData.prescription;
+           window.rxStore[p._id] = rx.medicines; // Store object to avoid inline json string escaping
+           
+           html += `
+            <div class="rx-item">
+                <div>
+                    <h3 style="font-size:15px; color:#0f172a;">${p.name}</h3>
+                    <div style="font-size:12px; color:#64748b; margin-top:4px;">
+                        ${rx.medicines.map(m => `💊 ${m.medicineName} (${m.dosage})`).join('<br>')}
+                    </div>
+                </div>
+                <button class="btn-save" style="padding:8px 16px; width:auto;" onclick="loadToCart('${p._id}')">Auto-Fill Bill</button>
+            </div>
+           `;
+        }
+      }
+      list.innerHTML = html;
+    } catch(err) {
+      list.innerHTML = '<div style="color:red; text-align:center;">Error loading</div>';
+    }
+}
+
+function loadToCart(patientId) {
+    cart = [];
+    currentRxPatientId = patientId;
+    document.getElementById('billedPatientName').textContent = "Billed for Patient";
+
+    const medicines = window.rxStore[patientId] || [];
+
+    medicines.forEach(prescribedMed => {
+        const invItem = inventory.find(i => i.name.toLowerCase() === prescribedMed.medicineName.toLowerCase());
+        if(invItem) {
+            cart.push({ ...invItem, qty: 1 }); 
+        } else {
+             toast(`Cannot find ${prescribedMed.medicineName} in stock.`, 'error');
+        }
+    });
+
+    renderCart();
+    closeModal('rxModal');
+    toast(`Prescription loaded. Please update quantities if needed.`);
+}
+
+function toast(msg, type='success'){
+  const t = document.getElementById('tst');
+  t.textContent = msg;
+  t.className = 'toastbox show';
+  if(type === 'error') t.classList.add('err');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function openAddMedModal() { toast("Not supported in server mode. Edit db or seed.", 'error'); }
+function openStockModal(id) { toast("Not supported in server mode. Edit db or seed.", 'error'); }
+
+fetchInventory();
+renderCart();
+</script>
+</body>
+</html>

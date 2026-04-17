@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MediPulse - Doctor Directory</title>
+<script>
+    if(localStorage.getItem('userRole') !== 'doctor' && localStorage.getItem('userRole') !== 'guest') {
+        alert('Access Denied. Doctor access required.');
+        window.location.href = '8login.html';
+    }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -195,120 +201,75 @@ body {
   </div>
 </div>
 
+<a href="3doctor_module2.html"><button>Login as Doctor</button></a>
+
 <script>
-  // Extended Doctor Data Array with More Details
-  const doctors = [
-    {
-      id: "D1", name: "Dr. Arvind Mehta", spec: "General Physician", bg: "linear-gradient(135deg, #0ea5e9, #0284c7)",
-      days: "Mon - Sat", time: "09:00 AM - 02:00 PM", status: "busy", currentPatient: "Ramesh Kumar (T-12)", assignedToday: 24,
-      experience: "15+ Years", education: "MBBS, MD (Medicine)", cabin: "A-102", fee: "₹ 500",
-      about: "Dr. Arvind is a highly experienced physician specializing in internal medicine, viral fevers, and preventive healthcare strategies."
-    },
-    {
-      id: "D2", name: "Dr. Priya Sharma", spec: "Pediatrician", bg: "linear-gradient(135deg, #f43f5e, #e11d48)",
-      days: "Mon - Fri", time: "10:00 AM - 04:00 PM", status: "available", currentPatient: null, assignedToday: 15,
-      experience: "8 Years", education: "MBBS, MD (Pediatrics)", cabin: "B-205", fee: "₹ 600",
-      about: "Dr. Priya focuses on newborn care, child development, and vaccinations. She is known for her friendly approach towards kids."
-    },
-    {
-      id: "D3", name: "Dr. Deepak Rao", spec: "Cardiologist", bg: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
-      days: "Tue - Sun", time: "11:00 AM - 05:00 PM", status: "busy", currentPatient: "Sunita Devi (T-E1)", assignedToday: 8,
-      experience: "20 Years", education: "MBBS, DM (Cardiology)", cabin: "ICU-1", fee: "₹ 1200",
-      about: "Dr. Deepak is a senior cardiologist specializing in echocardiography, angioplasty, and critical heart conditions."
-    },
-    {
-      id: "D4", name: "Dr. Neha Verma", spec: "Neurologist", bg: "linear-gradient(135deg, #10b981, #059669)",
-      days: "Mon, Wed, Fri", time: "02:00 PM - 07:00 PM", status: "off", currentPatient: null, assignedToday: 0,
-      experience: "12 Years", education: "MBBS, DM (Neurology)", cabin: "C-301", fee: "₹ 1000",
-      about: "Expert in treating migraines, epilepsy, and nerve disorders. She uses advanced neuro-diagnostic techniques."
-    },
-    {
-      id: "D5", name: "Dr. Suresh Tiwari", spec: "Orthopedic", bg: "linear-gradient(135deg, #f59e0b, #d97706)",
-      days: "Mon - Sat", time: "09:00 AM - 01:00 PM", status: "busy", currentPatient: "Vijay Singh (T-11)", assignedToday: 18,
-      experience: "18 Years", education: "MBBS, MS (Ortho)", cabin: "A-105", fee: "₹ 800",
-      about: "Specializes in joint replacement surgeries, sports injuries, and complex fracture management."
-    },
-    {
-      id: "D6", name: "Dr. Anita Desai", spec: "Dermatologist", bg: "linear-gradient(135deg, #ec4899, #be185d)",
-      days: "Thu - Sun", time: "10:00 AM - 03:00 PM", status: "available", currentPatient: null, assignedToday: 12,
-      experience: "10 Years", education: "MBBS, MD (Dermatology)", cabin: "B-210", fee: "₹ 700",
-      about: "Renowned for clinical dermatology, cosmetic procedures, and advanced laser treatments for skin conditions."
+  let doctors = [];
+  
+  async function loadDoctors() {
+    try {
+      const response = await fetch('http://localhost:5000/api/doctors');
+      const data = await response.json();
+      
+      // Map backend data to frontend properties if needed, or add defaults
+      doctors = data.map((doc, index) => ({
+        id: doc._id,
+        name: doc.name,
+        spec: doc.specialization,
+        bg: 'linear-gradient(135deg, #0ea5e9, #0284c7)', // default background
+        days: "Mon - Sat", time: "09:00 AM - 02:00 PM", status: "available",
+        currentPatient: null, assignedToday: 0,
+        experience: "10+ Years", education: "MBBS", cabin: "C-" + (index+1), fee: "₹ 500",
+        about: "Experienced doctor dedicated to providing excellent care."
+      }));
+      renderDoctors(doctors);
+    } catch(err) {
+      console.error(err);
+      document.getElementById('doctorGrid').innerHTML = '<p>Error loading doctors.</p>';
     }
-  ];
-
-  function getInitials(name) {
-    return name.replace('Dr. ', '').split(' ').map(n => n[0]).join('').substring(0, 2);
   }
 
-  function getStatusMarkup(status) {
-    if (status === 'available') return `<div class="doc-status st-available">AVAILABLE</div>`;
-    if (status === 'busy') return `<div class="doc-status st-busy">IN CABIN</div>`;
-    return `<div class="doc-status st-off">OFF DUTY</div>`;
-  }
+  // Initial Fetch
+  loadDoctors();
 
-  // Render Function
   function renderDoctors(list) {
     const grid = document.getElementById('doctorGrid');
+    if(list.length === 0) {
+        grid.innerHTML = '<p style="color:#64748b;font-weight:600;">No doctors found...</p>';
+        return;
+    }
     grid.innerHTML = list.map(doc => `
-      <div class="doc-card">
-        ${getStatusMarkup(doc.status)}
-        
-        <div class="doc-top">
-          <div class="doc-avatar" style="background: ${doc.bg}">${getInitials(doc.name)}</div>
-          <div class="doc-info">
-            <div class="doc-name">${doc.name}</div>
-            <div class="doc-spec">${doc.spec}</div>
+      <div class="doc-card" onclick="openModal('${doc.id}')">
+        <div class="card-head">
+          <div class="avatar" style="background:${doc.bg}">${getInitials(doc.name)}</div>
+          <div class="badge ${doc.status === 'available' ? 'ava' : 'bsy'}">
+            ${doc.status === 'available' ? 'Available' : 'Busy'}
           </div>
         </div>
-
-        <div class="doc-details">
-          <div class="detail-row">
-            <div class="detail-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <div class="detail-text">
-              <div class="dt-lbl">Schedule Days</div>
-              <div class="dt-val">${doc.days}</div>
-            </div>
-          </div>
-          <div class="detail-row">
-            <div class="detail-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="detail-text">
-              <div class="dt-lbl">Timings</div>
-              <div class="dt-val">${doc.time}</div>
-            </div>
-          </div>
-          
-          ${doc.status === 'busy' && doc.currentPatient ? `
-            <div class="detail-row active-patient">
-              <div class="detail-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <div class="detail-text">
-                <div class="dt-lbl">Currently Serving</div>
-                <div class="dt-val">${doc.currentPatient}</div>
-              </div>
-            </div>
-          ` : ''}
+        <div class="doc-info">
+          <h3>${doc.name}</h3>
+          <p class="spec">${doc.spec}</p>
         </div>
-
-        <div class="doc-footer">
-          <div class="assigned-count">
-            Today's Queue <span>${doc.assignedToday}</span>
+        <div class="doc-stats">
+          <div class="stat-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Assigned: ${doc.assignedToday}</span>
           </div>
-          <button class="view-btn" onclick="openModal('${doc.id}')">
-            View Details 
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+          <div class="stat-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 2 15 8.5 22 9.5 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.5 9 8.5 12 2"/></svg>
+            <span>Exp: ${doc.experience}</span>
+          </div>
         </div>
       </div>
     `).join('');
   }
 
-  // Initial Render
-  renderDoctors(doctors);
+  function getInitials(name) {
+    let parts = name.replace('Dr. ','').trim().split(' ');
+    if(parts.length >= 2) return parts[0][0].toUpperCase() + parts[1][0].toUpperCase();
+    if(parts.length === 1 && parts[0].length > 0) return parts[0][0].toUpperCase();
+    return 'DR';
+  }
 
   // Search/Filter Functionality
   function filterDoctors(query) {
