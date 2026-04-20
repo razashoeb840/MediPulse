@@ -401,11 +401,11 @@ async function fetchInventory() {
     inventory = data.map(m => ({
       id: m._id,
       name: m.name,
-      illness: "General",
+      illness: m.illness || "General",
       type: m.category || "Normal",
       stock: m.stock,
       price: m.price || 15.00,
-      salesPerDay: 5
+      salesPerDay: m.salesPerDay || 5
     }));
     applyFilters();
   } catch(err) {
@@ -482,7 +482,7 @@ function renderInventory(data = inventory) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add to Bill
           </button>
-          <button class="edit-stock-btn" onclick="toast('Edit stock disabled in server mode', 'error')" title="Edit Price & Stock">
+          <button class="edit-stock-btn" onclick="openStockModal('${med.id}')" title="Edit Price & Stock">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
         </div>
@@ -759,8 +759,84 @@ function toast(msg, type='success'){
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function openAddMedModal() { toast("Not supported in server mode. Edit db or seed.", 'error'); }
-function openStockModal(id) { toast("Not supported in server mode. Edit db or seed.", 'error'); }
+function openAddMedModal() {
+  document.getElementById('newMedName').value = '';
+  document.getElementById('newMedIllness').value = '';
+  document.getElementById('newMedType').value = 'Normal';
+  document.getElementById('newMedCustomType').value = '';
+  document.getElementById('newMedPrice').value = '';
+  document.getElementById('newMedStock').value = '';
+  document.getElementById('newMedSales').value = '5';
+  document.getElementById('addMedModal').classList.add('active');
+}
+
+function toggleOtherType() {
+  const t = document.getElementById('newMedType').value;
+  document.getElementById('otherTypeGroup').style.display = t === 'Other' ? 'block' : 'none';
+}
+
+async function saveNewMedicine() {
+  const name = document.getElementById('newMedName').value.trim();
+  const illness = document.getElementById('newMedIllness').value.trim() || 'General';
+  let type = document.getElementById('newMedType').value;
+  if(type === 'Other') type = document.getElementById('newMedCustomType').value.trim() || 'Other';
+  const price = document.getElementById('newMedPrice').value;
+  const stock = document.getElementById('newMedStock').value;
+  const salesPerDay = document.getElementById('newMedSales').value || 5;
+
+  if(!name || !price || !stock) return toast('Name, Price and Stock are required', 'error');
+
+  try {
+    const res = await fetch(`${API_BASE}/medicines`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, illness, category: type, price, stock, salesPerDay })
+    });
+    if(res.ok) {
+      toast('Medicine added successfully');
+      closeModal('addMedModal');
+      fetchInventory();
+    } else {
+      toast('Failed to add medicine', 'error');
+    }
+  } catch(e) {
+    toast('Network Error', 'error');
+  }
+}
+
+function openStockModal(id) {
+  const med = inventory.find(i => i.id === id);
+  if(!med) return;
+  document.getElementById('modalMedId').value = id;
+  document.getElementById('modalMedName').textContent = `Edit ${med.name}`;
+  document.getElementById('modalMedPrice').value = med.price;
+  document.getElementById('modalCurrentStock').value = med.stock;
+  document.getElementById('modalStockChange').value = '';
+  document.getElementById('stockModal').classList.add('active');
+}
+
+async function saveStock() {
+  const id = document.getElementById('modalMedId').value;
+  const price = document.getElementById('modalMedPrice').value;
+  const stockChange = document.getElementById('modalStockChange').value;
+  
+  try {
+    const res = await fetch(`${API_BASE}/medicines/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ price, stockChange })
+    });
+    if(res.ok) {
+      toast('Medicine updated');
+      closeModal('stockModal');
+      fetchInventory();
+    } else {
+      toast('Failed to update', 'error');
+    }
+  } catch(e) {
+    toast('Network Error', 'error');
+  }
+}
 
 fetchInventory();
 renderCart();

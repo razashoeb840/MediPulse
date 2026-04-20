@@ -150,9 +150,9 @@ app.put('/api/patients/:id/status', async (req, res) => {
 
 // --- PRESCRIPTION APIs ---
 app.post('/api/prescriptions', async (req, res) => {
-    const { patientId, doctorId, medicines } = req.body;
+    const { patientId, doctorId, medicines, notes } = req.body;
     try {
-        const newPrescription = new Prescription({ patientId, doctorId, medicines });
+        const newPrescription = new Prescription({ patientId, doctorId, medicines, notes });
         await newPrescription.save();
         
         // Update patient status
@@ -246,6 +246,33 @@ app.post('/api/medicines/sell', async (req, res) => {
 });
 
 // --- ADMIN APIS ---
+app.post('/api/medicines', async (req, res) => {
+    const { name, stock, price, category, illness, salesPerDay } = req.body;
+    try {
+        const newMed = new Medicine({ name, stock: parseInt(stock)||0, price: parseFloat(price)||0, category, illness, salesPerDay: parseInt(salesPerDay)||5 });
+        await newMed.save();
+        res.status(201).json({ success: true, medicine: newMed });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/medicines/:id', async (req, res) => {
+    const { price, stockChange } = req.body;
+    try {
+        const medicine = await Medicine.findById(req.params.id);
+        if (!medicine) return res.status(404).json({ error: 'Medicine not found' });
+        
+        if (price !== undefined && price !== '') medicine.price = parseFloat(price);
+        if (stockChange !== undefined && stockChange !== '') medicine.stock += parseInt(stockChange, 10);
+        
+        await medicine.save();
+        res.json({ success: true, medicine });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const patientCount = await Patient.countDocuments();
@@ -311,7 +338,31 @@ app.post('/api/admin/register-staff', async (req, res) => {
     }
 });
 
-const PORT = 5000;
+app.delete('/api/admin/staff/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        if(id.startsWith('DOC')) {
+            await Doctor.findOneAndDelete({ doctorId: id });
+        } else {
+            await Staff.findOneAndDelete({ staffId: id });
+        }
+        res.json({ success: true });
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/doctors/:id/active', async (req, res) => {
+    try {
+        const { isActive } = req.body;
+        await Doctor.findByIdAndUpdate(req.params.id, { isActive });
+        res.json({ success: true });
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
+});
+
+const PORT=5000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
