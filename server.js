@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/smartcare_hms').then(() => console.log('MongoDB Connected'))
+mongoose.connect(MONGO_URL).then(() => console.log('MongoDB Connected'))
   .catch(err => console.log('Error connecting to MongoDB:', err));
 
 // --- DOCTOR APIs ---
