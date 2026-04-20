@@ -17,7 +17,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-app.use(cors());
+app.use(cors({
+    origin: "https://medipulse-atx7.onrender.com"
+}));
 app.use(express.json());
 
 // Serve static frontend files
