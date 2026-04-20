@@ -17,7 +17,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-pp.use(cors({
+app.use(cors({
     origin: "https://medipulse-atx7.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
