@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB connection
-mongoose.connect('mongodb+srv://razashoeb2358:Raza%402358@cluster0.nttvkkc.mongodb.net/hospital').then(() => console.log('MongoDB Connected'))
+mongoose.connect(process.env.MONGO_URI).then(() => console.log('MongoDB Connected'))
   .catch(err => console.log('Error connecting to MongoDB:', err));
 
 // --- DOCTOR APIs ---
