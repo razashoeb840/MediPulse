@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-
+require('dotenv').config();
 const Doctor = require('./models/Doctor');
 const Patient = require('./models/Patient');
 const Bed = require('./models/Bed');
@@ -18,9 +18,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(cors({
-    origin: "https://medipulse-atx7.onrender.com",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    origin: "*"
 }));
 app.use(express.json());
 
@@ -365,8 +363,7 @@ app.put('/api/doctors/:id/active', async (req, res) => {
          res.status(500).json({ error: err.message });
     }
 });
-
-const PORT=5000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
