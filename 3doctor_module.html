@@ -206,10 +206,10 @@ body {
   
   async function loadDoctors(isFirstLoad = false) {
     try {
-      const response = await fetch('http://localhost:5000/api/doctors');
+      const response = await fetch('https://medipulse-tyfp.onrender.com/api/doctors');
       const data = await response.json();
       
-      const patientsRes = await fetch('http://localhost:5000/api/patients/queue');
+      const patientsRes = await fetch('https://medipulse-tyfp.onrender.com/api/patients/queue');
       let queue = [];
       if (patientsRes.ok) queue = await patientsRes.json();
       
