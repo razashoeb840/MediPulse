@@ -5,6 +5,8 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 require('dotenv').config();
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public'))); // If you have a public folder
 
 // Import Models
 const Doctor = require('./models/Doctor');
