@@ -86,19 +86,25 @@ app.post('/api/admin/register-staff', async (req, res) => {
     try {
         const { role, name } = req.body;
         
-        // This handles saving to the correct MongoDB Collection
-        const Model = role === 'doctor' ? Doctor : Staff;
-        
-        const newUser = new Model({
-            ...req.body,
-            // Ensure ID is generated correctly based on role
-            id: role === 'doctor' ? 'DOC-' + Date.now() : 'STAFF-' + Date.now()
-        });
-
-        await newUser.save();
-        res.json({ success: true, user: newUser });
+        // Use the appropriate model based on the role selected in the UI
+        if (role === 'doctor') {
+            const newDoctor = new Doctor({
+                ...req.body,
+                isActive: true // Default status for new doctors
+            });
+            await newDoctor.save();
+            return res.json({ success: true, user: { doctorId: 'DOC-' + Date.now() } });
+        } else {
+            // This handles Administrators, Receptionists, and Pharmacists
+            const newStaff = new Staff({ 
+                name, 
+                role 
+            });
+            await newStaff.save();
+            return res.json({ success: true, user: { staffId: 'STAFF-' + Date.now() } });
+        }
     } catch (err) {
-        console.error(err);
+        console.error('Registration Error:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
