@@ -8,6 +8,7 @@ const PrescriptionSchema = new mongoose.Schema({
         dosage: { type: String, required: true },
         duration: { type: String, required: true }
     }],
+    notes: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 

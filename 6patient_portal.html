@@ -76,6 +76,10 @@
         <div class="left-content">
             <h1>Skip the Line.<br>Register Instantly.</h1>
             <p>Welcome to MediPulse Self-Service Portal. Tell us your symptoms and generate your OPD token right here securely.</p>
+            <button onclick="window.location.href='3doctor_module.html'" style="margin-top: 20px; padding: 12px 24px; border-radius: 8px; border: none; background: #fff; color: #059669; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; gap: 8px;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+                Explore Doctors
+            </button>
         </div>
     </div>
     
@@ -137,7 +141,7 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5000/api';
+        const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
 
         async function loadDoctors() {
             try {

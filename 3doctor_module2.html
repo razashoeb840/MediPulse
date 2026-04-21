@@ -25,8 +25,9 @@
 
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <h2>Doctor Login</h2>
-    <input type="text" id="doctorNameInput" placeholder="Enter Doctor Name (e.g. Dr. John Smith)">
+    <select id="doctorNameSelect" style="width: 100%; padding: 12px; margin-bottom: 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family:var(--font);">
+      <option value="">Loading Doctors...</option>
+    </select>
     <button onclick="loginDoctor()">Login</button>
   </div>
 </div>
@@ -173,6 +174,14 @@
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   
   svg.icon { display: inline-block; vertical-align: middle; }
+
+  /* Switch */
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; margin-right: 5px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ef4444; transition: .4s; border-radius: 24px; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  input:checked + .slider { background-color: #01ca8b; }
+  input:checked + .slider:before { transform: translateX(20px); }
 </style>
 
 <div class="toast-wrap" id="toastWrap"></div>
@@ -186,10 +195,14 @@
     <div class="logo-sub">Doctor Portal — Live Patient Management</div>
   </div>
   <div class="hdr-right">
-    <div class="doc-badge">
-      <span class="dot dot-green"></span> Dr. Arvind Mehta · General Physician
+    <div class="doc-badge" id="docBadgeContainer">
+      <span class="dot dot-green" id="statusDot"></span> <span id="docBadgeText">Please Login</span>
     </div>
-    <div class="avatar">AM</div>
+    <label class="switch" style="display:none;" id="activeSwitch" title="Toggle Availability">
+      <input type="checkbox" id="doctorActiveToggle" onchange="toggleDoctorActive(this.checked)">
+      <span class="slider"></span>
+    </label>
+    <div class="avatar" id="docAvatarLabel">?</div>
   </div>
 </div>
 
@@ -239,11 +252,32 @@ let selectedId = null;
 let tempRx = [];
 
 // API URI Base
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+
+let allDocsForLogin = [];
+let allMedicines = [];
+
+async function initDropdowns() {
+  try {
+    const res = await fetch(`${API_BASE}/doctors`);
+    allDocsForLogin = await res.json();
+    const sel = document.getElementById('doctorNameSelect');
+    if(sel) {
+      sel.innerHTML = '<option value="">-- Select Your Profile --</option>' + 
+        allDocsForLogin.map(d => `<option value="${d.name}">${d.name} (${d.specialization})</option>`).join('');
+    }
+  } catch(e) {}
+  
+  try {
+    const resM = await fetch(`${API_BASE}/medicines`);
+    allMedicines = await resM.json();
+  } catch(e) {}
+}
+initDropdowns();
 
 async function loginDoctor() {
-  const name = document.getElementById('doctorNameInput').value;
-  if (!name) return alert('Enter doctor name');
+  const name = document.getElementById('doctorNameSelect').value;
+  if (!name) return alert('Please select your doctor profile');
   
   try {
     const res = await fetch(`${API_BASE}/doctors/login`, {
@@ -255,15 +289,40 @@ async function loginDoctor() {
     if (data.success) {
       currentDoctor = data.doctor;
       document.getElementById('loginOverlay').style.display = 'none';
-      document.querySelector('.doc-badge').innerHTML = `<span class="dot dot-green"></span> ${currentDoctor.name} · ${currentDoctor.specialization}`;
-      document.querySelector('.avatar').innerText = currentDoctor.name.substring(4, 6).toUpperCase();
+      
+      const isAct = currentDoctor.isActive !== false;
+      document.getElementById('docBadgeText').innerText = `${currentDoctor.name} · ${currentDoctor.specialization}`;
+      document.getElementById('statusDot').className = isAct ? 'dot dot-green' : 'dot dot-amber';
+      document.getElementById('docAvatarLabel').innerText = currentDoctor.name.replace('Dr. ', '').substring(0, 2).toUpperCase();
+      
+      document.getElementById('activeSwitch').style.display = 'inline-block';
+      document.getElementById('doctorActiveToggle').checked = isAct;
+      
       loadPatients();
     } else {
-      alert('Doctor not found in database. Seeded doctors are: Dr. John Smith, Dr. Sarah Connor, Dr. Albert Einstein.');
+      alert('Doctor not found in database.');
     }
   } catch (err) {
     console.error(err);
     alert('Error connecting to server.');
+  }
+}
+
+async function toggleDoctorActive(isActive) {
+  if(!currentDoctor) return;
+  try {
+    const res = await fetch(`${API_BASE}/doctors/${currentDoctor._id}/active`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isActive })
+    });
+    if(res.ok) {
+        showToast(`Marked as ${isActive ? 'Available' : 'Not Available'}`, 'success');
+        currentDoctor.isActive = isActive;
+        document.getElementById('statusDot').className = isActive ? 'dot dot-green' : 'dot dot-amber';
+    }
+  } catch(e) {
+      console.error(e);
   }
 }
 
@@ -383,10 +442,11 @@ function renderBody(p) {
   const isDone = p.status==='completed'||p.status==='prescribed';
   
   let rxSection = '';
-  if(isDone && p.rx.length>0) {
+  if(isDone && (p.rx.length>0 || p.notes)) {
     rxSection = `<div class="completed-rx">
       <h4>Prescribed Medicines</h4>
       ${p.rx.map(r=>`<span class="rx-pill">${r.name} · ${r.dose} · ${r.freq} · ${r.dur}</span>`).join('')}
+      ${p.notes ? `<h4 style="margin-top:12px;">Doctor Notes / Tests</h4><p style="font-size:12px; color:#065f46; background:rgba(255,255,255,0.7); padding:8px; border-radius:8px; margin-top:4px;">${p.notes}</p>` : ''}
     </div>`;
   } else if(!isDone) {
     rxSection = `<div class="panel">
@@ -398,7 +458,9 @@ function renderBody(p) {
           <div class="rx-lbl">Medicine Name</div><div class="rx-lbl">Dosage</div><div class="rx-lbl">Frequency</div><div class="rx-lbl">Duration</div><div class="rx-lbl"></div>
         </div>
         <div id="rxRows"></div>
-        <button class="add-med-btn" onclick="addRxRow()">+ Add Medicine</button>
+        <button class="add-med-btn" onclick="addRxRow()" style="margin-top:10px; margin-bottom:15px;">+ Add Medicine</button>
+        <div class="rx-lbl" style="margin-bottom:8px;">Doctor Notes / Suggested Tests</div>
+        <textarea id="docNotes" class="notes-area" placeholder="Enter tests, diet plan, or other notes here..."></textarea>
       </div>
     </div>`;
   }
@@ -425,7 +487,10 @@ function renderRxRows() {
   const durs = ['3 Days','5 Days','7 Days'];
   container.innerHTML = tempRx.map((r,i) => `
     <div class="rx-row">
-      <input type="text" placeholder="e.g. Paracetamol 500mg" value="${r.name}" oninput="tempRx[${i}].name=this.value">
+      <select onchange="tempRx[${i}].name=this.value">
+        <option value="">Select Medicine</option>
+        ${allMedicines.map(m=>`<option value="${m.name}" ${r.name===m.name?'selected':''}>${m.name} (Stock: ${m.stock})</option>`).join('')}
+      </select>
       <input type="text" placeholder="e.g. 500mg" value="${r.dose}" oninput="tempRx[${i}].dose=this.value">
       <select onchange="tempRx[${i}].freq=this.value">
         ${freqs.map(f=>`<option value="${f}" ${r.freq===f?'selected':''}>${f}</option>`).join('')}
@@ -470,7 +535,10 @@ async function prescribeAndComplete(id) {
   if(!p) return;
   p.rx = tempRx.filter(r=>r.name.trim()!=='');
   
-  if (p.rx.length === 0) return alert('Prescription cannot be empty. Add medicines or use Mark Done.');
+  const notesField = document.getElementById('docNotes');
+  const dNotes = notesField ? notesField.value.trim() : '';
+
+  if (p.rx.length === 0 && dNotes === '') return alert('Prescription cannot be empty. Add medicines, write notes, or use Mark Done.');
 
   // Format array for backend
   const medicinesArray = p.rx.map(r => ({
@@ -486,12 +554,14 @@ async function prescribeAndComplete(id) {
       body: JSON.stringify({
         patientId: id,
         doctorId: currentDoctor._id,
-        medicines: medicinesArray
+        medicines: medicinesArray,
+        notes: dNotes
       })
     });
     
     if (res.ok) {
       p.status = 'prescribed';
+      p.notes = dNotes;
       tempRx = [];
       showToast(`Prescription saved for ${p.name}`, 'success');
       renderList();

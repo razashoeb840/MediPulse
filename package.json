@@ -1,8 +1,9 @@
 {
-  "name": "smartcare---copy",
+  "name": "medipulse",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -10,13 +11,13 @@
     "url": "git+https://github.com/razashoeb840/MediPulse.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Rohit Raj Gupta",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/razashoeb840/MediPulse/issues"
   },
   "homepage": "https://github.com/razashoeb840/MediPulse#readme",
-  "description": "",
+  "description": "MediPulse Hospital Management System",
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
