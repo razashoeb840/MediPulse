@@ -163,3 +163,61 @@ app.get('/api/admin/stats', async (req, res) => {
         const patientCount = await Patient.countDocuments();
         const docCount = await Doctor.countDocuments();
         const staffCount = await Staff.countDocuments();
+        
+        const rawMeds = await Medicine.find();
+        const totalMedStock = rawMeds.reduce((acc, med) => acc + (med.stock * med.price), 0);
+        
+        const beds = await Bed.find();
+        let occupiedBeds = 0;
+        let totalBeds = 0;
+        beds.forEach(b => {
+             if (['occupied', 'emg', 'occ'].includes(b.status)) occupiedBeds++;
+             totalBeds++;
+        });
+
+        res.json({
+            patients: patientCount,
+            doctors: docCount,
+            staff: staffCount,
+            inventoryValue: totalMedStock,
+            bedOccupancyPercentage: totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0
+        });
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/admin/register-staff', async (req, res) => {
+    const { name, role, specialization, experience, qualifications, contactNumber, address, aadhar } = req.body;
+    try {
+        if(role === 'doctor') {
+            const count = await Doctor.countDocuments();
+            const doctorId = `DOC-${100 + count + 1}`;
+            const newDoc = new Doctor({ 
+                doctorId, name: 'Dr. ' + name, specialization, experience: experience || 0, 
+                qualifications: qualifications || 'MBBS', contactNumber: contactNumber || 'N/A', 
+                address: address || 'N/A', aadhar: aadhar || '[Aadhaar Redacted]' 
+            });
+            await newDoc.save();
+            res.json({ success: true, user: newDoc });
+        } else {
+            const count = await Staff.countDocuments({ role });
+            const prefix = role.substring(0,3).toUpperCase();
+            const staffId = `${prefix}-${100 + count + 1}`;
+            const newStaff = new Staff({ 
+                staffId, name, role, contactNumber: contactNumber || 'N/A', 
+                address: address || 'N/A', aadhar: aadhar || '[Aadhaar Redacted]' 
+            });
+            await newStaff.save();
+            res.json({ success: true, user: newStaff });
+        }
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
+});
+
+// --- SERVER START ---
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
