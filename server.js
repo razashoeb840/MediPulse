@@ -5,8 +5,11 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 require('dotenv').config();
-app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'public'))); // If you have a public folder
+
+// Define app FIRST
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 // Import Models
 const Doctor = require('./models/Doctor');
@@ -17,14 +20,12 @@ const Staff = require('./models/Staff');
 
 const seed = require('./seed');
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
-
+// Middlewares
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// DATABASE CONNECTION
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcare_hms';
 
 mongoose.connect(mongoURI)
@@ -33,6 +34,12 @@ mongoose.connect(mongoURI)
         try { await seed(); console.log('🚀 Database Seeded'); } catch (e) { console.error(e); }
     })
     .catch(err => console.error('❌ MongoDB Error:', err));
+
+// --- ROOT ROUTE (Fixes "Cannot GET /") ---
+// Ensure the filename below matches your main file (1index.html or index.html)
+app.get('/', (req, res) => { 
+    res.sendFile(path.join(__dirname, '1index.html')); 
+});
 
 // --- DOCTOR ROUTES ---
 app.get('/api/doctors', async (req, res) => {
