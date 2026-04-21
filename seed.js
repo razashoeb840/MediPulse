@@ -6,7 +6,7 @@ const Staff = require('./models/Staff');
 
 async function seed() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/smartcare_hms');
+        await mongoose.connect('mongodb+srv://rajguptarohit361_db_user:Medipulse2026@cluster0.fcqohdp.mongodb.net/smartcare_hms?retryWrites=true&w=majority&appName=Cluster0');
 
         console.log('Connected to MongoDB for seeding...');
 
