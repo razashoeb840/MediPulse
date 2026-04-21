@@ -6,7 +6,6 @@ const { Server } = require('socket.io');
 const path = require('path');
 require('dotenv').config();
 
-// Define app FIRST
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
@@ -17,7 +16,6 @@ const Patient = require('./models/Patient');
 const Bed = require('./models/Bed');
 const Medicine = require('./models/Medicine');
 const Staff = require('./models/Staff');
-
 const seed = require('./seed');
 
 // Middlewares
@@ -25,25 +23,18 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// DATABASE CONNECTION
+// Database Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcare_hms';
 
 mongoose.connect(mongoURI)
     .then(async () => {
         console.log('✅ MongoDB Connected Successfully');
-        try { 
-            await seed(); 
-            console.log('🚀 Database Seeded/Initialized'); 
-        } catch (e) { 
-            console.error('❌ Seeding Error:', e); 
-        }
+        try { await seed(); console.log('🚀 Database Initialized'); } catch (e) { console.error(e); }
     })
     .catch(err => console.error('❌ MongoDB Error:', err));
 
 // --- ROOT ROUTE ---
-app.get('/', (req, res) => { 
-    res.sendFile(path.join(__dirname, '1index.html')); 
-});
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '1index.html')); });
 
 // --- DOCTOR ROUTES ---
 app.get('/api/doctors', async (req, res) => {
@@ -58,7 +49,7 @@ app.post('/api/doctors/login', async (req, res) => {
     } catch (err) { res.status(500).json(err); }
 });
 
-// --- PATIENT & QUEUE ROUTES ---
+// --- PATIENT ROUTES ---
 app.post('/api/patients/register', async (req, res) => {
     try {
         const lastPatient = await Patient.findOne().sort({ token: -1 });
@@ -70,81 +61,35 @@ app.post('/api/patients/register', async (req, res) => {
 });
 
 app.get('/api/patients/queue', async (req, res) => {
-    try { 
-        res.json(await Patient.find({ status: { $ne: 'completed' } })
-            .populate('assignedDoctor')
-            .sort({ token: 1 })); 
-    } catch (err) { res.status(500).json(err); }
+    try { res.json(await Patient.find({ status: { $ne: 'completed' } }).populate('assignedDoctor').sort({ token: 1 })); } 
+    catch (err) { res.status(500).json(err); }
 });
 
 app.get('/api/patients/all', async (req, res) => {
-    try {
-        const history = await Patient.find().populate('assignedDoctor').sort({ createdAt: -1 });
-        res.json(history);
-    } catch (err) { res.status(500).json(err); }
+    try { res.json(await Patient.find().populate('assignedDoctor').sort({ createdAt: -1 })); } 
+    catch (err) { res.status(500).json(err); }
 });
 
-// --- MEDICINE / PHARMACY ROUTES ---
-app.get('/api/medicines', async (req, res) => {
-    try { res.json(await Medicine.find()); } catch (err) { res.status(500).json(err); }
-});
-
-app.post('/api/medicines', async (req, res) => {
-    try {
-        const newMed = new Medicine(req.body);
-        await newMed.save();
-        res.json({ success: true, medicine: newMed });
-    } catch (err) { res.status(500).json(err); }
-});
-
-// --- ADMIN & STAFF ROUTES ---
-app.get('/api/admin/stats', async (req, res) => {
-    try {
-        const patients = await Patient.countDocuments();
-        const doctors = await Doctor.countDocuments();
-        const staff = await Staff.countDocuments();
-        const occupiedBeds = await Bed.countDocuments({ status: 'occ' });
-        res.json({ 
-            patients, 
-            doctors, 
-            staff, 
-            bedOccupancyPercentage: Math.round((occupiedBeds/30)*100), 
-            inventoryValue: 4500 
-        });
-    } catch (err) { res.status(500).json(err); }
-});
-
-app.get('/api/admin/staff', async (req, res) => {
-    try {
-        // Combined list for the frontend staff directory
-        const docs = await Doctor.find();
-        const others = await Staff.find();
-        
-        // Ensure both have an 'id' field for frontend s.id.startsWith() logic
-        const formattedDocs = docs.map(d => ({ ...d._doc, id: d.id || `DOC-${d._id.toString().slice(-4)}` }));
-        const formattedOthers = others.map(s => ({ ...s._doc, id: s.id || `REC-${s._id.toString().slice(-4)}` }));
-        
-        res.json([...formattedDocs, ...formattedOthers]);
-    } catch (err) { res.status(500).json(err); }
-});
-
+// --- REGISTRATION LOGIC (FIXED) ---
 app.post('/api/admin/register-staff', async (req, res) => {
     try {
-        const { role, name } = req.body;
+        const { role } = req.body;
         const timestamp = Date.now().toString().slice(-6);
-        
+
         if (role === 'doctor') {
-            const newDoctor = new Doctor({
+            // Save to DOCTOR collection
+            const newDoc = new Doctor({
                 ...req.body,
-                id: `DOC-${timestamp}`, // Crucial for frontend logic
+                id: `DOC-${timestamp}`, // Matches s.id.startsWith('DOC')
                 isActive: true
             });
-            await newDoctor.save();
-            return res.json({ success: true, user: newDoctor });
+            await newDoc.save();
+            return res.json({ success: true, user: newDoc });
         } else {
+            // Save to STAFF collection
             const newStaff = new Staff({ 
                 ...req.body,
-                id: `REC-${timestamp}` // Crucial for frontend logic
+                id: `REC-${timestamp}` // Matches s.id.startsWith('REC')
             });
             await newStaff.save();
             return res.json({ success: true, user: newStaff });
@@ -155,32 +100,40 @@ app.post('/api/admin/register-staff', async (req, res) => {
     }
 });
 
-app.delete('/api/admin/staff/:id', async (req, res) => {
+// --- ADMIN STATS & STAFF LIST ---
+app.get('/api/admin/stats', async (req, res) => {
     try {
-        const { id } = req.params;
-        let deleted;
-        if (id.startsWith('DOC')) {
-            deleted = await Doctor.findOneAndDelete({ id });
-        } else {
-            deleted = await Staff.findOneAndDelete({ id });
-        }
-        res.json({ success: !!deleted });
-    } catch (err) { res.status(500).json({ success: false }); }
+        const patients = await Patient.countDocuments();
+        const doctors = await Doctor.countDocuments();
+        const staff = await Staff.countDocuments();
+        const beds = await Bed.countDocuments({ status: 'occ' });
+        res.json({ patients, doctors, staff, bedOccupancyPercentage: Math.round((beds/30)*100), inventoryValue: 4500 });
+    } catch (err) { res.status(500).json(err); }
 });
 
-// --- BED MANAGEMENT ROUTES ---
-app.get('/api/beds', async (req, res) => {
-    try { 
-        res.json(await Bed.find().populate('patient')); 
+app.get('/api/admin/staff', async (req, res) => {
+    try {
+        const docs = await Doctor.find();
+        const others = await Staff.find();
+        res.json([...docs, ...others]);
     } catch (err) { res.status(500).json(err); }
+});
+
+// --- BED & MEDICINE ROUTES ---
+app.get('/api/beds', async (req, res) => {
+    try { res.json(await Bed.find().populate('patient')); } catch (err) { res.status(500).json(err); }
 });
 
 app.put('/api/beds/:id', async (req, res) => {
     try {
         const bed = await Bed.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        io.emit('bed_updated', bed); 
+        io.emit('bed_updated', bed);
         res.json(bed);
     } catch (err) { res.status(500).json(err); }
+});
+
+app.get('/api/medicines', async (req, res) => {
+    try { res.json(await Medicine.find()); } catch (err) { res.status(500).json(err); }
 });
 
 const PORT = process.env.PORT || 5000;
