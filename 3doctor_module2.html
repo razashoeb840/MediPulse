@@ -238,6 +238,23 @@
 </div>
 
 <script>
+  // Locate this part inside your 3doctor_module2.html <script> tag
+const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+
+async function initDropdowns() {
+  try {
+    const res = await fetch(`${API_BASE}/doctors`);
+    const allDocs = await res.json();
+    const sel = document.getElementById('doctorNameSelect');
+    if(sel) {
+      sel.innerHTML = '<option value="">-- Select Your Profile --</option>' + 
+        allDocs.map(d => `<option value="${d.name}">${d.name} (${d.specialization})</option>`).join('');
+    }
+  } catch(e) {
+    console.error("Dropdown failed to load", e);
+  }
+}
+initDropdowns();
 const colors = [
   'linear-gradient(135deg,#0ea5e9,#0284c7)',
   'linear-gradient(135deg,#f43f5e,#e11d48)',
@@ -251,8 +268,7 @@ let currentDoctor = null;
 let selectedId = null;
 let tempRx = [];
 
-// API URI Base
-const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+
 
 let allDocsForLogin = [];
 let allMedicines = [];

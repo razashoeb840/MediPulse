@@ -33,191 +33,56 @@ mongoose.connect(mongoURI)
     .then(async () => {
         console.log('✅ MongoDB Connected Successfully');
         try {
-            // This ensures data is present in Atlas even if you can't seed locally
             await seed(); 
-            console.log('🚀 Database initialized/checked via Render');
+            console.log('🚀 Database initialized via Render');
         } catch (seedErr) {
             console.error('❌ Seed Error:', seedErr);
         }
     })
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-// --- ROOT ROUTE ---
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '1index.html'));
-});
+// --- API ROUTES ---
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '1index.html')); });
 
-// --- DOCTOR APIs ---
 app.get('/api/doctors', async (req, res) => {
-    try {
-        const doctors = await Doctor.find();
-        res.json(doctors);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    try { res.json(await Doctor.find()); } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/doctors/login', async (req, res) => {
     const { name } = req.body;
     try {
         const doctor = await Doctor.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
-        if (doctor) {
-            res.json({ success: true, doctor });
-        } else {
-            res.status(404).json({ success: false, message: 'Doctor not found' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+        doctor ? res.json({ success: true, doctor }) : res.status(404).json({ success: false });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.get('/api/doctors/:id/patients', async (req, res) => {
-    try {
-        const patients = await Patient.find({ assignedDoctor: req.params.id, status: 'waiting' }).sort({ token: 1 });
-        res.json(patients);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// --- PATIENT APIs ---
 app.post('/api/patients/register', async (req, res) => {
-    const { name, age, contact, problem, assignedDoctor, address, aadhar } = req.body;
+    const { name, age, contact, problem, assignedDoctor } = req.body;
     try {
-        if (!assignedDoctor) return res.status(400).json({ error: 'Doctor assignment is required' });
-        
-        const doctor = await Doctor.findById(assignedDoctor);
-        if (!doctor) return res.status(400).json({ error: 'Selected doctor not found' });
-
         const lastPatient = await Patient.findOne().sort({ token: -1 });
         const token = lastPatient ? lastPatient.token + 1 : 1;
-
-        const newPatient = new Patient({
-            token, name, age, contact: contact || 'N/A', problem, assignedDoctor: doctor._id, 
-            address: address || 'N/A', 
-            aadhar: aadhar || '[Aadhaar Redacted]'
-        });
-
+        const newPatient = new Patient({ token, name, age, contact, problem, assignedDoctor, status: 'waiting' });
         await newPatient.save();
-        res.status(201).json({ success: true, patient: newPatient, doctor });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+        res.status(201).json({ success: true, patient: newPatient });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/patients/queue', async (req, res) => {
-    try {
-        const queue = await Patient.find({ status: { $ne: 'completed' } })
-            .populate('assignedDoctor', 'name specialization')
-            .sort({ token: 1 });
-        res.json(queue);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    try { res.json(await Patient.find({ status: { $ne: 'completed' } }).populate('assignedDoctor').sort({ token: 1 })); } 
+    catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/patients/:id/status', async (req, res) => {
-    const { status } = req.body;
     try {
-        const updateData = { status };
-        if (status === 'completed') updateData.completedAt = new Date();
-        const patient = await Patient.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        const patient = await Patient.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
         io.emit('patient_updated', patient);
         res.json({ success: true, patient });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// --- BED APIs ---
 app.get('/api/beds', async (req, res) => {
-    try {
-        const beds = await Bed.find().populate('patient');
-        res.json(beds);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    try { res.json(await Bed.find().populate('patient')); } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/beds/:id', async (req, res) => {
-    const { status, patient } = req.body;
-    try {
-        const bed = await Bed.findById(req.params.id);
-        if (!bed) return res.status(404).json({ error: 'Bed not found' });
-        
-        bed.status = status;
-        bed.patient = patient || null;
-        await bed.save();
-
-        const populatedBed = await Bed.findById(req.params.id).populate('patient');
-        io.emit('bed_updated', populatedBed);
-        res.json({ success: true, bed: populatedBed });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// --- ADMIN APIs ---
-app.get('/api/admin/stats', async (req, res) => {
-    try {
-        const patientCount = await Patient.countDocuments();
-        const docCount = await Doctor.countDocuments();
-        const staffCount = await Staff.countDocuments();
-        
-        const rawMeds = await Medicine.find();
-        const totalMedStock = rawMeds.reduce((acc, med) => acc + (med.stock * med.price), 0);
-        
-        const beds = await Bed.find();
-        let occupiedBeds = 0;
-        let totalBeds = 0;
-        beds.forEach(b => {
-             if (['occupied', 'emg', 'occ'].includes(b.status)) occupiedBeds++;
-             totalBeds++;
-        });
-
-        res.json({
-            patients: patientCount,
-            doctors: docCount,
-            staff: staffCount,
-            inventoryValue: totalMedStock,
-            bedOccupancyPercentage: totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0
-        });
-    } catch(err) {
-         res.status(500).json({ error: err.message });
-    }
-});
-
-app.post('/api/admin/register-staff', async (req, res) => {
-    const { name, role, specialization, experience, qualifications, contactNumber, address, aadhar } = req.body;
-    try {
-        if(role === 'doctor') {
-            const count = await Doctor.countDocuments();
-            const doctorId = `DOC-${100 + count + 1}`;
-            const newDoc = new Doctor({ 
-                doctorId, name: 'Dr. ' + name, specialization, experience: experience || 0, 
-                qualifications: qualifications || 'MBBS', contactNumber: contactNumber || 'N/A', 
-                address: address || 'N/A', aadhar: aadhar || '[Aadhaar Redacted]' 
-            });
-            await newDoc.save();
-            res.json({ success: true, user: newDoc });
-        } else {
-            const count = await Staff.countDocuments({ role });
-            const prefix = role.substring(0,3).toUpperCase();
-            const staffId = `${prefix}-${100 + count + 1}`;
-            const newStaff = new Staff({ 
-                staffId, name, role, contactNumber: contactNumber || 'N/A', 
-                address: address || 'N/A', aadhar: aadhar || '[Aadhaar Redacted]' 
-            });
-            await newStaff.save();
-            res.json({ success: true, user: newStaff });
-        }
-    } catch(err) {
-         res.status(500).json({ error: err.message });
-    }
-});
-
-// --- SERVER START ---
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+server.listen(PORT, () => { console.log(`🚀 Server running on port ${PORT}`); });

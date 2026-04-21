@@ -140,84 +140,119 @@
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+  <script>
+    // 1. Point to your live Render backend
+    const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
 
-        async function loadDoctors() {
-            try {
-                const res = await fetch(`${API_BASE}/doctors`);
-                const doctors = await res.json();
-                const sel = document.getElementById('doctorSelect');
-                sel.innerHTML = '<option value="">-- Choose a Doctor --</option>' + 
-                    doctors.map(d => `<option value="${d._id}">Dr. ${d.name} (${d.specialization})</option>`).join('');
-            } catch(err) {
-                console.error(err);
-                document.getElementById('doctorSelect').innerHTML = '<option value="">Error loading doctors</option>';
+    async function submitRegistration() {
+        const payload = {
+            name: document.getElementById('fn').value.trim(),
+            age: document.getElementById('age').value.trim(),
+            contact: document.getElementById('contact').value.trim(),
+            problem: document.getElementById('problem').value.trim(),
+            assignedDoctor: document.getElementById('doctorSelect').value
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/patients/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById('regForm').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+                document.getElementById('tokenDisplay').textContent = 'T-' + data.patient.token;
             }
+        } catch(err) {
+            alert('Connection error to cloud server');
         }
-        loadDoctors();
+    }
 
-        function openPayment() {
-            const fn = document.getElementById('fn').value;
-            const age = document.getElementById('age').value;
-            const contact = document.getElementById('contact').value;
-            const problem = document.getElementById('problem').value;
-            const doc = document.getElementById('doctorSelect').value;
+    // 2. Load the doctor list into the dropdown when the page opens
+    async function loadDoctors() {
+        try {
+            const res = await fetch(`${API_BASE}/doctors`);
+            const doctors = await res.json();
+            const sel = document.getElementById('doctorSelect');
+            sel.innerHTML = '<option value="">-- Choose a Doctor --</option>' + 
+                doctors.map(d => `<option value="${d._id}">Dr. ${d.name} (${d.specialization})</option>`).join('');
+        } catch(err) {
+            console.error('Error loading doctors:', err);
+            document.getElementById('doctorSelect').innerHTML = '<option value="">Error loading doctors</option>';
+        }
+    }
+    loadDoctors();
 
-            if(!fn || !age || !contact || !problem || !doc) {
-                alert('Please fill out all fields before proceeding to payment.');
-                return;
+    // 3. Open the payment modal after validating the form
+    function openPayment() {
+        const fn = document.getElementById('fn').value;
+        const age = document.getElementById('age').value;
+        const contact = document.getElementById('contact').value;
+        const problem = document.getElementById('problem').value;
+        const doc = document.getElementById('doctorSelect').value;
+
+        if(!fn || !age || !contact || !problem || !doc) {
+            alert('Please fill out all fields before proceeding to payment.');
+            return;
+        }
+        document.getElementById('paymentModal').classList.add('active');
+    }
+
+    // 4. Close the payment modal
+    function closePayment() {
+        document.getElementById('paymentModal').classList.remove('active');
+    }
+
+    // 5. Simulate the payment process
+    async function processPayment() {
+        const btn = document.querySelector('.btn-pay');
+        btn.textContent = 'Processing...';
+        btn.style.opacity = '0.7';
+
+        // Wait 1 second to "simulate" a bank connection, then submit
+        setTimeout(async () => {
+            await submitRegistration();
+        }, 1000);
+    }
+
+    // 6. The ACTUAL registration function that sends data to Render
+    async function submitRegistration() {
+        const payload = {
+            name: document.getElementById('fn').value.trim(),
+            age: document.getElementById('age').value.trim(),
+            contact: document.getElementById('contact').value.trim(),
+            problem: document.getElementById('problem').value.trim(),
+            assignedDoctor: document.getElementById('doctorSelect').value
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/patients/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            closePayment();
+            
+            if(data.success) {
+                // Hide the form and show the success screen with the Token Number
+                document.getElementById('regForm').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+                document.getElementById('tokenDisplay').textContent = 'T-' + data.patient.token;
+            } else {
+                alert('Registration failed: ' + (data.error || 'Server error'));
+                const btn = document.querySelector('.btn-pay');
+                btn.textContent = 'Pay ₹ 500 & Register';
+                btn.style.opacity = '1';
             }
-            document.getElementById('paymentModal').classList.add('active');
+        } catch(err) {
+            console.error('Registration Error:', err);
+            alert('Connection error. Please check if the server is running.');
         }
-
-        function closePayment() {
-            document.getElementById('paymentModal').classList.remove('active');
-        }
-
-        async function processPayment() {
-            // Simulate processing
-            const btn = document.querySelector('.btn-pay');
-            btn.textContent = 'Processing...';
-            btn.style.opacity = '0.7';
-
-            setTimeout(async () => {
-                await submitRegistration();
-            }, 1000);
-        }
-
-        async function submitRegistration() {
-            const payload = {
-                name: document.getElementById('fn').value.trim(),
-                age: document.getElementById('age').value.trim(),
-                contact: document.getElementById('contact').value.trim(),
-                problem: document.getElementById('problem').value.trim(),
-                assignedDoctor: document.getElementById('doctorSelect').value
-            };
-
-            try {
-                const res = await fetch(`${API_BASE}/patients/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                
-                closePayment();
-                if(data.success) {
-                    document.getElementById('regForm').style.display = 'none';
-                    document.getElementById('successScreen').style.display = 'block';
-                    document.getElementById('tokenDisplay').textContent = 'T-' + data.patient.token;
-                } else {
-                    alert('Registration failed: ' + data.error);
-                    const btn = document.querySelector('.btn-pay');
-                    btn.textContent = 'Pay ₹ 500 & Register';
-                    btn.style.opacity = '1';
-                }
-            } catch(err) {
-                alert('Connection error');
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>

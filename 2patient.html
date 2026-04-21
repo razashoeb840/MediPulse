@@ -465,13 +465,16 @@ body{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+  
+
+// STEP 1: Define the live Render URL
   const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+
   let tokNum = 1, totalPts = 0, beds = 14, emgCnt = 0;
   let selPrioVal = 'normal';
-  let pendingDelIdx = null;
-
   let patients = [];
 
+  // STEP 2: Load Data from Cloud
   async function fetchQueue() {
     try {
       const res = await fetch(`${API_BASE}/patients/queue`);
@@ -491,20 +494,26 @@ body{
       renderTbl(patients);
       updateNowServing(patients);
     } catch(err) {
-      console.error(err);
+      console.error('Queue load error:', err);
     }
   }
 
+  // STEP 3: Load Doctors for the Dropdown
   async function fetchDoctors() {
-      try {
-          const res = await fetch(`${API_BASE}/doctors`);
-          const availableDoctors = await res.json();
-          const docSelect = document.getElementById('fdoc');
-          docSelect.innerHTML = '<option value="">Select a Doctor</option>' + availableDoctors.map(d => `<option value="${d._id}">${d.name} (${d.specialization || 'General'})</option>`).join('');
-      } catch(err) {
-          console.error('Error fetching doctors:', err);
+    try {
+      const res = await fetch(`${API_BASE}/doctors`);
+      const availableDoctors = await res.json();
+      const docSelect = document.getElementById('fdoc');
+      if (docSelect) {
+        docSelect.innerHTML = '<option value="">Select a Doctor</option>' + 
+          availableDoctors.map(d => `<option value="${d._id}">${d.name} (${d.specialization || 'General'})</option>`).join('');
       }
+    } catch(err) {
+      console.error('Error fetching doctors:', err);
+    }
   }
+
+ 
 
   function updateNowServing(list) {
       const waitList = list.filter(p => p.status === 'waiting' || p.status === 'prescribed');
