@@ -1,24 +1,24 @@
-const Doctor = require('./models/Doctor');
 const Bed = require('./models/Bed');
-const Staff = require('./models/Staff');
+const Doctor = require('./models/Doctor');
 
 async function seed() {
     try {
         const bedCount = await Bed.countDocuments();
-        if (bedCount === 0) {
+        // If there aren't 30 beds, we add the missing ones
+        if (bedCount < 30) {
+            // Clear existing beds to avoid duplicates during this fix
+            await Bed.deleteMany({}); 
+            
             const beds = [];
-            // Create 10 ICU Beds
             for(let i=1; i<=10; i++) beds.push({ bedId: `ICU-${i}`, zone: 'ICU', status: 'free' });
-            // Create 10 General Beds
             for(let i=1; i<=10; i++) beds.push({ bedId: `GEN-${i}`, zone: 'General', status: 'free' });
-            // Create 10 Private Beds
             for(let i=1; i<=10; i++) beds.push({ bedId: `PVT-${i}`, zone: 'Private', status: 'free' });
             
             await Bed.insertMany(beds);
-            console.log('✅ 30 Beds (ICU, General, Private) Seeded Successfully');
+            console.log('✅ 30 Beds Created: ICU, General, and Private');
         }
     } catch (error) {
-        console.error('❌ Seeding failed:', error);
+        console.error('❌ Seed Error:', error);
     }
 }
 module.exports = seed;
