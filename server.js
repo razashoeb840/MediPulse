@@ -71,51 +71,41 @@ app.get('/api/patients/all', async (req, res) => {
 });
 
 // --- REGISTRATION LOGIC (FIXED) ---
+// --- REGISTRATION FIX ---
 app.post('/api/admin/register-staff', async (req, res) => {
     try {
         const { role } = req.body;
         const timestamp = Date.now().toString().slice(-6);
+        const Model = role === 'doctor' ? Doctor : Staff;
+        
+        const newUser = new Model({
+            ...req.body,
+            // Ensure the field is named exactly 'id' to match frontend
+            id: role === 'doctor' ? `DOC-${timestamp}` : `REC-${timestamp}`
+        });
 
-        if (role === 'doctor') {
-            // Save to DOCTOR collection
-            const newDoc = new Doctor({
-                ...req.body,
-                id: `DOC-${timestamp}`, // Matches s.id.startsWith('DOC')
-                isActive: true
-            });
-            await newDoc.save();
-            return res.json({ success: true, user: newDoc });
-        } else {
-            // Save to STAFF collection
-            const newStaff = new Staff({ 
-                ...req.body,
-                id: `REC-${timestamp}` // Matches s.id.startsWith('REC')
-            });
-            await newStaff.save();
-            return res.json({ success: true, user: newStaff });
-        }
+        await newUser.save();
+        res.json({ success: true, user: newUser });
     } catch (err) {
-        console.error('Registration Error:', err);
+        console.error(err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// --- ADMIN STATS & STAFF LIST ---
-app.get('/api/admin/stats', async (req, res) => {
-    try {
-        const patients = await Patient.countDocuments();
-        const doctors = await Doctor.countDocuments();
-        const staff = await Staff.countDocuments();
-        const beds = await Bed.countDocuments({ status: 'occ' });
-        res.json({ patients, doctors, staff, bedOccupancyPercentage: Math.round((beds/30)*100), inventoryValue: 4500 });
-    } catch (err) { res.status(500).json(err); }
-});
-
+// --- STAFF LIST FIX ---
 app.get('/api/admin/staff', async (req, res) => {
     try {
         const docs = await Doctor.find();
         const others = await Staff.find();
-        res.json([...docs, ...others]);
+        // Combine and ensure every object has an 'id' string to prevent 'startsWith' errors
+        const combined = [...docs, ...others].map(person => {
+            const p = person.toObject();
+            return {
+                ...p,
+                id: p.id || `TEMP-${p._id}` // Fallback if id is missing
+            };
+        });
+        res.json(combined);
     } catch (err) { res.status(500).json(err); }
 });
 

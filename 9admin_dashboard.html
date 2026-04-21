@@ -296,8 +296,7 @@
     } catch(e) {
         console.error(e);
     }
-}
-        async function fetchStaff() {
+} async function fetchStaff() {
     try {
         // Change: Added /admin before /staff
         const res = await fetch(`${API_BASE}/admin/staff`);
@@ -331,6 +330,7 @@
         console.error('Failed to load staff list', e);
     }
 }
+       
      async function registerPersonnel(event, type) {
     event.preventDefault();
     
