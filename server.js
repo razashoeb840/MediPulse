@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-
+require('dotenv').config();
 const Doctor = require('./models/Doctor');
 const Patient = require('./models/Patient');
 const Bed = require('./models/Bed');
@@ -17,7 +17,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-app.use(cors());
+app.use(cors({
+    origin: "*"
+}));
 app.use(express.json());
 
 // Serve static frontend files
@@ -28,8 +30,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '1index.html'));
 });
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/smartcare_hms').then(() => console.log('MongoDB Connected'))
+// --- UPDATED MONGODB CONNECTION ---
+// This uses the MONGODB_URI variable you set in Render, 
+// and falls back to localhost only if that doesn't exist.
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/smartcare_hms';
+
+mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB Connected Successfully'))
   .catch(err => console.log('Error connecting to MongoDB:', err));
 
 // --- DOCTOR APIs ---
@@ -273,6 +280,33 @@ app.put('/api/medicines/:id', async (req, res) => {
     }
 });
 
+app.post('/api/medicines', async (req, res) => {
+    const { name, stock, price, category, illness, salesPerDay } = req.body;
+    try {
+        const newMed = new Medicine({ name, stock: parseInt(stock)||0, price: parseFloat(price)||0, category, illness, salesPerDay: parseInt(salesPerDay)||5 });
+        await newMed.save();
+        res.status(201).json({ success: true, medicine: newMed });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/medicines/:id', async (req, res) => {
+    const { price, stockChange } = req.body;
+    try {
+        const medicine = await Medicine.findById(req.params.id);
+        if (!medicine) return res.status(404).json({ error: 'Medicine not found' });
+        
+        if (price !== undefined && price !== '') medicine.price = parseFloat(price);
+        if (stockChange !== undefined && stockChange !== '') medicine.stock += parseInt(stockChange, 10);
+        
+        await medicine.save();
+        res.json({ success: true, medicine });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const patientCount = await Patient.countDocuments();
@@ -347,46 +381,22 @@ app.delete('/api/admin/staff/:id', async (req, res) => {
             await Staff.findOneAndDelete({ staffId: id });
         }
         res.json({ success: true });
-    } catch(err) {const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
-const path = require('path');
-
-// Models
-const Doctor = require('./models/Doctor');
-const Patient = require('./models/Patient');
-const Bed = require('./models/Bed');
-const Medicine = require('./models/Medicine');
-const Prescription = require('./models/Prescription');
-const Staff = require('./models/Staff');
-
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
-
-app.use(cors());
-app.use(express.json());
-
-// Serve static frontend files
-app.use(express.static(__dirname));
-
-// Route root to Main Dashboard
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '1index.html'));
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
 });
 
-// --- UPDATED MONGODB CONNECTION ---
-// This uses the MONGODB_URI variable you set in Render, 
-// and falls back to localhost only if that doesn't exist.
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcare_hms';
+app.put('/api/doctors/:id/active', async (req, res) => {
+    try {
+        const { isActive } = req.body;
+        await Doctor.findByIdAndUpdate(req.params.id, { isActive });
+        res.json({ success: true });
+    } catch(err) {
+         res.status(500).json({ error: err.message });
+    }
+});
 
-mongoose.connect(mongoURI)
-  .then(() => console.log('MongoDB Connected Successfully'))
-  .catch(err => console.log('Error connecting to MongoDB:', err));
 
-// --- DOCTOR APIs ---
 app.get('/api/doctors', async (req, res) => {
     try {
         const doctors = await Doctor.find();
@@ -728,21 +738,4 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-         res.status(500).json({ error: err.message });
-    }
-});
 
-app.put('/api/doctors/:id/active', async (req, res) => {
-    try {
-        const { isActive } = req.body;
-        await Doctor.findByIdAndUpdate(req.params.id, { isActive });
-        res.json({ success: true });
-    } catch(err) {
-         res.status(500).json({ error: err.message });
-    }
-});
-
-const PORT=5000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
