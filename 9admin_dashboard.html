@@ -387,10 +387,13 @@
     }
     btn.innerHTML = 'Assign ID & Register';
 }
-    
-        // Real-time MongoDB Polling (every 5 seconds)
-        setInterval(fetchStats, 5000);
-        setInterval(fetchStaff, 5000);
+    // Initial load to prevent empty tables on start
+fetchStats();
+fetchStaff();
+
+// Real-time MongoDB Polling (every 5 seconds)
+setInterval(fetchStats, 5000);
+setInterval(fetchStaff, 5000);
     </script>
 </body>
 </html>

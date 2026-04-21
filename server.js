@@ -31,12 +31,16 @@ const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcare
 mongoose.connect(mongoURI)
     .then(async () => {
         console.log('✅ MongoDB Connected Successfully');
-        try { await seed(); console.log('🚀 Database Seeded'); } catch (e) { console.error(e); }
+        try { 
+            await seed(); 
+            console.log('🚀 Database Seeded/Initialized'); 
+        } catch (e) { 
+            console.error('❌ Seeding Error:', e); 
+        }
     })
     .catch(err => console.error('❌ MongoDB Error:', err));
 
-// --- ROOT ROUTE (Fixes "Cannot GET /") ---
-// Ensure the filename below matches your main file (1index.html or index.html)
+// --- ROOT ROUTE ---
 app.get('/', (req, res) => { 
     res.sendFile(path.join(__dirname, '1index.html')); 
 });
@@ -66,8 +70,18 @@ app.post('/api/patients/register', async (req, res) => {
 });
 
 app.get('/api/patients/queue', async (req, res) => {
-    try { res.json(await Patient.find({ status: { $ne: 'completed' } }).populate('assignedDoctor').sort({ token: 1 })); } 
-    catch (err) { res.status(500).json(err); }
+    try { 
+        res.json(await Patient.find({ status: { $ne: 'completed' } })
+            .populate('assignedDoctor')
+            .sort({ token: 1 })); 
+    } catch (err) { res.status(500).json(err); }
+});
+
+app.get('/api/patients/all', async (req, res) => {
+    try {
+        const history = await Patient.find().populate('assignedDoctor').sort({ createdAt: -1 });
+        res.json(history);
+    } catch (err) { res.status(500).json(err); }
 });
 
 // --- MEDICINE / PHARMACY ROUTES ---
@@ -82,62 +96,92 @@ app.post('/api/medicines', async (req, res) => {
         res.json({ success: true, medicine: newMed });
     } catch (err) { res.status(500).json(err); }
 });
-app.post('/api/admin/register-staff', async (req, res) => {
-    try {
-        const { role, name } = req.body;
-        
-        // Use the appropriate model based on the role selected in the UI
-        if (role === 'doctor') {
-            const newDoctor = new Doctor({
-                ...req.body,
-                isActive: true // Default status for new doctors
-            });
-            await newDoctor.save();
-            return res.json({ success: true, user: { doctorId: 'DOC-' + Date.now() } });
-        } else {
-            // This handles Administrators, Receptionists, and Pharmacists
-            const newStaff = new Staff({ 
-                name, 
-                role 
-            });
-            await newStaff.save();
-            return res.json({ success: true, user: { staffId: 'STAFF-' + Date.now() } });
-        }
-    } catch (err) {
-        console.error('Registration Error:', err);
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
+
 // --- ADMIN & STAFF ROUTES ---
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const patients = await Patient.countDocuments();
         const doctors = await Doctor.countDocuments();
         const staff = await Staff.countDocuments();
-        const beds = await Bed.countDocuments({ status: 'occ' });
-        res.json({ patients, doctors, staff, bedOccupancyPercentage: Math.round((beds/30)*100), inventoryValue: 4500 });
+        const occupiedBeds = await Bed.countDocuments({ status: 'occ' });
+        res.json({ 
+            patients, 
+            doctors, 
+            staff, 
+            bedOccupancyPercentage: Math.round((occupiedBeds/30)*100), 
+            inventoryValue: 4500 
+        });
     } catch (err) { res.status(500).json(err); }
 });
 
 app.get('/api/admin/staff', async (req, res) => {
-    try { res.json(await Staff.find()); } catch (err) { res.status(500).json(err); }
+    try {
+        // Combined list for the frontend staff directory
+        const docs = await Doctor.find();
+        const others = await Staff.find();
+        
+        // Ensure both have an 'id' field for frontend s.id.startsWith() logic
+        const formattedDocs = docs.map(d => ({ ...d._doc, id: d.id || `DOC-${d._id.toString().slice(-4)}` }));
+        const formattedOthers = others.map(s => ({ ...s._doc, id: s.id || `REC-${s._id.toString().slice(-4)}` }));
+        
+        res.json([...formattedDocs, ...formattedOthers]);
+    } catch (err) { res.status(500).json(err); }
 });
+
+app.post('/api/admin/register-staff', async (req, res) => {
+    try {
+        const { role, name } = req.body;
+        const timestamp = Date.now().toString().slice(-6);
+        
+        if (role === 'doctor') {
+            const newDoctor = new Doctor({
+                ...req.body,
+                id: `DOC-${timestamp}`, // Crucial for frontend logic
+                isActive: true
+            });
+            await newDoctor.save();
+            return res.json({ success: true, user: newDoctor });
+        } else {
+            const newStaff = new Staff({ 
+                ...req.body,
+                id: `REC-${timestamp}` // Crucial for frontend logic
+            });
+            await newStaff.save();
+            return res.json({ success: true, user: newStaff });
+        }
+    } catch (err) {
+        console.error('Registration Error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+app.delete('/api/admin/staff/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        let deleted;
+        if (id.startsWith('DOC')) {
+            deleted = await Doctor.findOneAndDelete({ id });
+        } else {
+            deleted = await Staff.findOneAndDelete({ id });
+        }
+        res.json({ success: !!deleted });
+    } catch (err) { res.status(500).json({ success: false }); }
+});
+
 // --- BED MANAGEMENT ROUTES ---
 app.get('/api/beds', async (req, res) => {
     try { 
-        const beds = await Bed.find().populate('patient');
-        res.json(beds); 
+        res.json(await Bed.find().populate('patient')); 
     } catch (err) { res.status(500).json(err); }
 });
 
 app.put('/api/beds/:id', async (req, res) => {
     try {
         const bed = await Bed.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        io.emit('bed_updated', bed); // Sends real-time update to all dashboards
+        io.emit('bed_updated', bed); 
         res.json(bed);
     } catch (err) { res.status(500).json(err); }
 });
-
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => { console.log(`🚀 Server live on port ${PORT}`); });
