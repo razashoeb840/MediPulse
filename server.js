@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 // --- UPDATED MONGODB CONNECTION ---
 // This uses the MONGODB_URI variable you set in Render, 
 // and falls back to localhost only if that doesn't exist.
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/smartcare_hms';
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/smartcare_hms';
 
 mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB Connected Successfully'))
