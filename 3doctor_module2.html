@@ -345,31 +345,28 @@ async function toggleDoctorActive(isActive) {
 async function loadPatients() {
   if (!currentDoctor) return;
   try {
-    const res = await fetch(`${API_BASE}/doctors/${currentDoctor._id}/patients`);
-    const data = await res.json();
+    const res = await fetch(`${API_BASE}/patients/queue`);
+    const allPatients = await res.json();
     
-    // Map backend data to frontend model
-    patients = data.map((p, i) => ({
+    // Filter patients assigned to THIS doctor
+    const myPatients = allPatients.filter(p => 
+      (p.assignedDoctor._id === currentDoctor._id || p.assignedDoctor === currentDoctor._id)
+    );
+
+    patients = myPatients.map((p, i) => ({
       id: p._id,
       token: 'T-' + p.token,
       name: p.name,
       age: p.age,
-      gender: 'M', // defaulting
-      bg: colors[i % colors.length],
       complaint: p.problem,
-      bp: '120/80', temp: '98.6°F', pulse: '75', spo2: '98%',
-      history: 'Not specified',
-      allergies: 'None',
-      status: p.status, // 'waiting', 'prescribed', 'completed'
-      rx: [],
-      notes: '',
+      status: p.status,
+      bg: colors[i % colors.length],
       initials: p.name.substring(0, 2).toUpperCase()
     }));
     
     renderList();
   } catch (err) {
     console.error(err);
-    showToast('Failed to load patients', 'warn');
   }
 }
 
