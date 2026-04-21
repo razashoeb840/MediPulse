@@ -245,11 +245,12 @@ body{
 
 <script src="https://medipulse-tyfp.onrender.com/socket.io/socket.io.js"></script>
 <script>
+  const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
 const socket = io('https://medipulse-tyfp.onrender.com');
 let beds = [];
 let pendingPatients = [];
 let sel = null;
-const API_BASE = 'https://medipulse-tyfp.onrender.com/api';
+
 
 socket.on('bed_updated', (updatedBed) => {
   const index = beds.findIndex(b => b._id === updatedBed._id);

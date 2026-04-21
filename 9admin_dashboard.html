@@ -268,129 +268,126 @@
         }
 
         async function fetchStats() {
-            try {
-                const res = await fetch(`${API_BASE}/stats`);
-                const data = await res.json();
-                
-                document.getElementById('stat-patients').innerText = data.patients;
-                document.getElementById('stat-beds').innerText = data.bedOccupancyPercentage + '%';
-                document.getElementById('stat-inventory').innerText = '₹' + data.inventoryValue.toLocaleString();
-                document.getElementById('stat-staff').innerText = (data.doctors + data.staff);
-            } catch(e) {
-                console.error('Failed to load stats', e);
-            }
+    try {
+        // Change: Added /admin/ before stats to match server.js
+        const res = await fetch(`${API_BASE}/admin/stats`);
+        const data = await res.json();
+        
+        document.getElementById('stat-patients').innerText = data.patients;
+        document.getElementById('stat-beds').innerText = data.bedOccupancyPercentage + '%';
+        document.getElementById('stat-inventory').innerText = '₹' + data.inventoryValue.toLocaleString();
+        document.getElementById('stat-staff').innerText = (data.doctors + data.staff);
+    } catch(e) {
+        console.error('Failed to load stats', e);
+    }
+}
+       async function deleteStaff(id) {
+    if(!confirm(`Are you sure you want to delete ${id}?`)) return;
+    try {
+        // Change: Added /admin before /staff
+        const res = await fetch(`${API_BASE}/admin/staff/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if(result.success) {
+            fetchStaff();
+            fetchStats();
+        } else {
+            alert('Delete failed');
         }
-
-        async function deleteStaff(id) {
-            if(!confirm(`Are you sure you want to delete ${id}?`)) return;
-            try {
-                const res = await fetch(`${API_BASE}/staff/${id}`, { method: 'DELETE' });
-                const result = await res.json();
-                if(result.success) {
-                    fetchStaff();
-                    fetchStats();
-                } else {
-                    alert('Delete failed');
-                }
-            } catch(e) {
-                console.error(e);
-            }
-        }
-
+    } catch(e) {
+        console.error(e);
+    }
+}
         async function fetchStaff() {
-            try {
-                const res = await fetch(`${API_BASE}/staff`);
-                const staff = await res.json();
-                
-                const docTbody = document.getElementById('docTableBody');
-                const recTbody = document.getElementById('recTableBody');
-                const pharTbody = document.getElementById('pharTableBody');
-                
-                docTbody.innerHTML = '';
-                recTbody.innerHTML = '';
-                pharTbody.innerHTML = '';
-                
-                staff.forEach(s => {
-                    const tr = `<tr>
-                        <td style="color:#059669; font-weight:700; width:120px;">${s.id}</td>
-                        <td style="font-weight:600;">${s.name}</td>
-                        <td><span class="role-badge">${s.role}</span></td>
-                        <td><button class="btn-del" onclick="deleteStaff('${s.id}')"><i class="fas fa-trash"></i></button></td>
-                    </tr>`;
+    try {
+        // Change: Added /admin before /staff
+        const res = await fetch(`${API_BASE}/admin/staff`);
+        const staff = await res.json();
+        
+        const docTbody = document.getElementById('docTableBody');
+        const recTbody = document.getElementById('recTableBody');
+        const pharTbody = document.getElementById('pharTableBody');
+        
+        docTbody.innerHTML = '';
+        recTbody.innerHTML = '';
+        pharTbody.innerHTML = '';
+        
+        staff.forEach(s => {
+            const tr = `<tr>
+                <td style="color:#059669; font-weight:700; width:120px;">${s.id}</td>
+                <td style="font-weight:600;">${s.name}</td>
+                <td><span class="role-badge">${s.role}</span></td>
+                <td><button class="btn-del" onclick="deleteStaff('${s.id}')"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
 
-                    if(s.id.startsWith('DOC')) {
-                        docTbody.innerHTML += tr;
-                    } else if(s.id.startsWith('REC')) {
-                        recTbody.innerHTML += tr;
-                    } else {
-                        pharTbody.innerHTML += tr;
-                    }
-                });
-            } catch(e) {
-                console.error('Failed to load staff list', e);
-            }
-        }
-
-        async function registerPersonnel(event, type) {
-            event.preventDefault();
-            
-            let payload = {};
-            let btnId = '';
-
-            if(type === 'doctor') {
-                payload = { 
-                    role: 'doctor', 
-                    name: document.getElementById('docName').value, 
-                    specialization: document.getElementById('docSpec').value,
-                    qualifications: document.getElementById('docQual').value,
-                    experience: document.getElementById('docExp').value,
-                    contactNumber: document.getElementById('docPhone').value,
-                    address: document.getElementById('docAddr').value,
-                    aadhar: document.getElementById('docAadhar').value
-                };
-                btnId = 'btn-doctor';
+            if(s.id.startsWith('DOC')) {
+                docTbody.innerHTML += tr;
+            } else if(s.id.startsWith('REC')) {
+                recTbody.innerHTML += tr;
             } else {
-                payload = { 
-                    role: document.getElementById('staffRole').value, 
-                    name: document.getElementById('staffName').value,
-                    contactNumber: document.getElementById('staffPhone').value,
-                    address: document.getElementById('staffAddr').value,
-                    aadhar: document.getElementById('staffAadhar').value
-                };
-                btnId = 'btn-staff';
+                pharTbody.innerHTML += tr;
             }
+        });
+    } catch(e) {
+        console.error('Failed to load staff list', e);
+    }
+}
+     async function registerPersonnel(event, type) {
+    event.preventDefault();
+    
+    let payload = {};
+    let btnId = '';
 
-            const btn = document.getElementById(btnId);
-            btn.innerHTML = 'Registering...';
+    if(type === 'doctor') {
+        payload = { 
+            role: 'doctor', 
+            name: document.getElementById('docName').value, 
+            specialization: document.getElementById('docSpec').value,
+            qualifications: document.getElementById('docQual').value,
+            experience: document.getElementById('docExp').value,
+            contactNumber: document.getElementById('docPhone').value,
+            address: document.getElementById('docAddr').value,
+            aadhar: document.getElementById('docAadhar').value
+        };
+        btnId = 'btn-doctor';
+    } else {
+        payload = { 
+            role: document.getElementById('staffRole').value, 
+            name: document.getElementById('staffName').value,
+            contactNumber: document.getElementById('staffPhone').value,
+            address: document.getElementById('staffAddr').value,
+            aadhar: document.getElementById('staffAadhar').value
+        };
+        btnId = 'btn-staff';
+    }
 
-            try {
-                const res = await fetch(`${API_BASE}/register-staff`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await res.json();
-                if(data.success) {
-                    alert(`Successfully registered! Initialized ID: ${data.user.doctorId || data.user.staffId}`);
-                    event.target.reset();
-                    closeModal(type === 'doctor' ? 'doctorModal' : 'staffModal');
-                    fetchStaff();
-                    fetchStats();
-                    window.location.reload(); // Force hot reload for all UI components
-                } else {
-                    alert('Registration failed');
-                }
-            } catch(e) {
-                alert('Connection Error to Backend');
-            }
-            btn.innerHTML = 'Assign ID & Register';
+    const btn = document.getElementById(btnId);
+    btn.innerHTML = 'Registering...';
+
+    try {
+        // Change: Added /admin before /register-staff to match server.js
+        const res = await fetch(`${API_BASE}/admin/register-staff`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await res.json();
+        if(data.success) {
+            alert(`Successfully registered! Initialized ID: ${data.user.doctorId || data.user.staffId}`);
+            event.target.reset();
+            closeModal(type === 'doctor' ? 'doctorModal' : 'staffModal');
+            fetchStaff();
+            fetchStats();
+            window.location.reload(); 
+        } else {
+            alert('Registration failed');
         }
-
-        // Initialize Page
-        fetchStats();
-        fetchStaff();
-
+    } catch(e) {
+        alert('Connection Error to Backend');
+    }
+    btn.innerHTML = 'Assign ID & Register';
+}
+    
         // Real-time MongoDB Polling (every 5 seconds)
         setInterval(fetchStats, 5000);
         setInterval(fetchStaff, 5000);
