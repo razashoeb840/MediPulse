@@ -82,7 +82,26 @@ app.post('/api/medicines', async (req, res) => {
         res.json({ success: true, medicine: newMed });
     } catch (err) { res.status(500).json(err); }
 });
+app.post('/api/admin/register-staff', async (req, res) => {
+    try {
+        const { role, name } = req.body;
+        
+        // This handles saving to the correct MongoDB Collection
+        const Model = role === 'doctor' ? Doctor : Staff;
+        
+        const newUser = new Model({
+            ...req.body,
+            // Ensure ID is generated correctly based on role
+            id: role === 'doctor' ? 'DOC-' + Date.now() : 'STAFF-' + Date.now()
+        });
 
+        await newUser.save();
+        res.json({ success: true, user: newUser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 // --- ADMIN & STAFF ROUTES ---
 app.get('/api/admin/stats', async (req, res) => {
     try {
@@ -97,15 +116,22 @@ app.get('/api/admin/stats', async (req, res) => {
 app.get('/api/admin/staff', async (req, res) => {
     try { res.json(await Staff.find()); } catch (err) { res.status(500).json(err); }
 });
-
-app.post('/api/admin/register-staff', async (req, res) => {
-    try {
-        const newStaff = new Staff(req.body);
-        newStaff.id = req.body.role === 'doctor' ? 'DOC-' + Date.now() : 'REC-' + Date.now();
-        await newStaff.save();
-        res.json({ success: true, user: newStaff });
+// --- BED MANAGEMENT ROUTES ---
+app.get('/api/beds', async (req, res) => {
+    try { 
+        const beds = await Bed.find().populate('patient');
+        res.json(beds); 
     } catch (err) { res.status(500).json(err); }
 });
+
+app.put('/api/beds/:id', async (req, res) => {
+    try {
+        const bed = await Bed.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        io.emit('bed_updated', bed); // Sends real-time update to all dashboards
+        res.json(bed);
+    } catch (err) { res.status(500).json(err); }
+});
+
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => { console.log(`🚀 Server live on port ${PORT}`); });
