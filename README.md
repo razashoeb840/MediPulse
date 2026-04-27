@@ -156,7 +156,7 @@ This project is currently maintained as an academic/portfolio project.
 This project is licensed under the **ISC License**.
 
 ---
-*Developed with ❤️ by SHOEB and Rohit for smarter healthcare management.*
+*Developed with ❤️ by SHOEB and ROHIT for smarter healthcare management.*
 
 
 Link-> https://smartcare-hms-avk9.onrender.com/1index.html
