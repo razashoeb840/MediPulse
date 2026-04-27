@@ -147,7 +147,7 @@ Here is a quick reference to the major RESTful APIs powering the backend:
 
 ## 🤝 Contribution
 
-This project is currently maintained as an academic/portfolio project. For feedback or suggestions, please refer to the repository owner.
+This project is currently maintained as an academic/portfolio project.
 
 ---
 
@@ -156,4 +156,7 @@ This project is currently maintained as an academic/portfolio project. For feedb
 This project is licensed under the **ISC License**.
 
 ---
-*Developed with ❤️ for smarter healthcare management.*
+*Developed with ❤️ by SHOEB and Rohit for smarter healthcare management.*
+
+
+Link-> https://smartcare-hms-avk9.onrender.com/1index.html
