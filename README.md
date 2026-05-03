@@ -25,9 +25,10 @@
 4. [Database Schema Design](#-database-schema-design)
 5. [Real-Time WebSocket Integration](#-real-time-websocket-integration)
 6. [Role-Based Modules](#-role-based-modules)
-7. [Installation & Deployment](#-installation--deployment)
-8. [API Reference](#-api-reference)
-9. [Future Scope](#-future-scope)
+7. [Project File Structure](#-project-file-structure)
+8. [Installation & Deployment](#-installation--deployment)
+9. [API Reference](#-api-reference)
+10. [Future Scope](#-future-scope)
 
 ---
 
@@ -82,6 +83,34 @@ The system uses **MongoDB** via the **Mongoose ODM**. The database is heavily no
 Unlike standard HTTP polling, MediPulse uses **Socket.io** to push state changes directly to connected clients.
 - `patient_updated`: Emitted when a doctor finishes a consultation. Automatically updates the Reception and Patient Portal queues.
 - `bed_updated`: Emitted when a bed is assigned or vacated, instantly refreshing the Bed Management grid for all users.
+
+---
+
+## 📁 Project File Structure
+A detailed breakdown of the codebase organization:
+```text
+📦 MediPulse (SmartCare)
+ ┣ 📂 models                  # MongoDB Mongoose Schemas
+ ┃ ┣ 📜 Bed.js                # Bed & Ward Schema
+ ┃ ┣ 📜 Doctor.js             # Doctor demographics & credentials Schema
+ ┃ ┣ 📜 Medicine.js           # Pharmacy Inventory Schema
+ ┃ ┣ 📜 Patient.js            # Patient Data & Queue Status Schema
+ ┃ ┣ 📜 Prescription.js       # Digital Prescription Schema
+ ┃ ┗ 📜 Staff.js              # Admin & Receptionist Schema
+ ┣ 📜 1index.html             # Landing page / Home
+ ┣ 📜 2patient.html           # Receptionist: Patient Registration UI
+ ┣ 📜 3doctor_module.html     # Doctor: Main Checkup & Prescription UI
+ ┣ 📜 3doctor_module2.html    # Doctor: Alternate view/dashboard
+ ┣ 📜 4bed_management.html    # Ward Boy / Reception: Bed Matrix UI
+ ┣ 📜 5medicine.html          # Pharmacist: POS & Inventory UI
+ ┣ 📜 6patient_portal.html    # Patient: Live Queue Tracking UI
+ ┣ 📜 7patient_history.html   # Records: Patient Consultation History
+ ┣ 📜 8login.html             # Global Authentication Portal
+ ┣ 📜 9admin_dashboard.html   # Admin: Analytics & Staff Registration UI
+ ┣ 📜 package.json            # Node.js dependencies & scripts
+ ┣ 📜 seed.js                 # Script to inject dummy data into MongoDB
+ ┗ 📜 server.js               # Main Express Server, REST APIs & Socket.io Logic
+```
 
 ---
 
@@ -157,11 +186,6 @@ The application will be accessible at `http://localhost:5000`. Start by navigati
 - **AI Disease Prediction:** Integrating machine learning models to analyze patient symptoms during registration.
 - **Video Consultations:** Expanding the Doctor portal to include WebRTC video calls for remote checkups.
 
----
-<div align="center">
-  <i>Developed with ❤️ to modernize healthcare administration.</i><br>
-  <b>Academic Project / Software Engineering Submission</b>
-</div>
 
 *Developed with ❤️ by SHOEB and ROHIT for smarter healthcare management.*
 
